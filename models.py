@@ -5,56 +5,71 @@ from sqlalchemy import create_engine
 import os
 
 
+NUGU_FIELDS = [
+    {'id': 'name', 'name': '이름', 'hint': '뀨냥이'},
+    {'id': 'ent_year', 'name': '학번', 'hint': '14'},
+    {'id': 'org', 'name': '소속'},
+    {'id': 'email', 'name': '이메일'},
+    {'id': 'phone', 'name': '전화번호', 'hint': '010-xxxx-xxxx'},
+    {'id': 'birth', 'name': '생일', 'hint': '1996-01-01'},
+    {'id': 'dorm', 'name': '기숙사'},
+    {'id': 'home_add', 'name': '집주소'},
+    {'id': 'facebook_id', 'name': 'Facebook ID'},
+    {'id': 'twitter_id', 'name': 'Twitter ID'},
+    {'id': 'github_id', 'name': 'Github ID'},
+    {'id': 'battlenet_id', 'name': 'Battlenet ID'},
+    {'id': 'website', 'name': '홈페이지'},
+]
+NUGU_FIELD_NAMES = list(map(lambda i: i['id'], NUGU_FIELDS))
+
+
 Base = declarative_base()
-NUGU_FIELDS = ['name', 'ent_year', 'org', 'phone', 'birth', 'dorm',
-               'facebook_id', 'twitter_id', 'github_id', 'battlenet_id',
-               'website']
-NUGU_HINT = {'name': '이름', 'ent_year': '학번', 'org': '소속',
-             'phone': '전화번호', 'birth': '생일', 'dorm': '기숙사',
-             'facebook_id': '페북', 'twitter_id': '트위터',
-             'github_id': 'Github', 'battlenet_id': '배틀넷',
-             'website': '홈페이지'}
+LIB_PATH = os.path.abspath(os.path.dirname(__file__))
+DB_PATH = os.path.join(LIB_PATH, 'db.sqlite3')
+
 
 class User(Base):
     __tablename__ = 'user'
 
     id = Column(String(30), primary_key=True)
-    email = Column(String(200))
-    name = Column(String(50))
-    ent_year = Column(Integer)
-    org = Column(String(200), nullable=True)
-    phone = Column(String(100), nullable=True)
-    birth = Column(String(30), nullable=True)
-    dorm = Column(String(100), nullable=True)
-
-    facebook_id = Column(String(100), nullable=True)
-    twitter_id = Column(String(100), nullable=True)
-    github_id = Column(String(100), nullable=True)
-    battlenet_id = Column(String(100), nullable=True)
-    website = Column(String(100), nullable=True)
-
-
-    def all_info(self):
-        resp = ["%s's information" % self.id, ]
-        for f in NUGU_FIELDS:
-            v = getattr(self, f)
-            if not v:
-                continue
-            resp.append('\t%s: %s' % (NUGU_HINT[f], v))
-        return '\n'.join(resp)
+    name = Column(String(255), nullable=True)
+    ent_year = Column(String(255), nullable=True)
+    org = Column(String(255), nullable=True)
+    email = Column(String(255), nullable=True)
+    phone = Column(String(255), nullable=True)
+    birth = Column(String(255), nullable=True)
+    dorm = Column(String(255), nullable=True)
+    home_add = Column(String(255), nullable=True)
+    facebook_id = Column(String(255), nullable=True)
+    twitter_id = Column(String(255), nullable=True)
+    github_id = Column(String(255), nullable=True)
+    battlenet_id = Column(String(255), nullable=True)
+    website = Column(String(255), nullable=True)
 
 
-    def short_info(self):
-        return str(self)
+    @staticmethod
+    def _gen_json(value_func):
+        result = ['{', ]
+        for i in NUGU_FIELDS:
+            result.append('    "%s": "%s",' % (i['id'], value_func(i)))
+        result[-1] = result[-1][:-1]
+        result.append('}')
+        return '\n'.join(result)
 
+    @staticmethod
+    def default_json():
+        return User._gen_json(lambda i: i.get('hint', ''))
+
+    def to_json(self):
+        return self._gen_json(lambda i: getattr(self, i['id']))
 
     def __str__(self):
         return u'%s (%s, %s)' % (self.id, self.name, self.ent_year)
 
 
-def create_session(path):
-    engine = create_engine('sqlite:///%s' % path)
-    if not os.path.exists(path):
+def create_session():
+    engine = create_engine('sqlite:///%s' % DB_PATH)
+    if not os.path.exists(DB_PATH):
         Base.metadata.create_all(engine)
 
     Base.metadata.bind = engine

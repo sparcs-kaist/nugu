@@ -1,5 +1,5 @@
 from slacker import Slacker
-from nugu import nugu
+from core import nugu
 from models import create_session
 from settings import TOKEN
 import asyncio
@@ -8,10 +8,40 @@ import websockets
 import os
 
 
-BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_PATH, 'db.sqlite3')
 slack = Slacker(TOKEN)
 session = create_session(DB_PATH)
+
+def nugu_core(session, text, email):
+    args = text.split(' ')
+    if len(args) < 2:
+        return MSG_HELP
+
+    if args[1].startswith('검색'):
+        return _nugu_search(session, email, args)
+    elif args[1].startswith('수정'):
+        return _nugu_modify(session, email, args)
+    elif args[1].startswith('목록'):
+        return _nugu_list(session)
+    elif args[1].startswith('뀨냥'):
+        return '냥><'
+    elif args[1].startswith('도움'):
+        return MSG_HELP
+    return _nugu_get(session, email, args)
+
+
+def nugu(session, text, email):
+    try:
+        return _nugu_core(session, text, email)
+    except Exception as e:
+        return MSG_ERROR % str(e)
+
+def _parse_email(email):
+    e = email.split('@')
+    if len(e) != 2:
+        return False, ''
+    if e[1] == 'sparcs.org':
+        return True, e[0]
+    return False, ''
 
 
 def _get_email(userid):
@@ -23,7 +53,7 @@ def handle(message):
     resp = ''
 
     if message['type'] == 'message' and \
-            message.get('subtype', '') != 'bot_message':
+            'user' in message and 'text' in message:
         text = message['text']
         channel = message['channel']
         if text.startswith('!누구'):
