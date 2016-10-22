@@ -1,1 +1,1 @@
-# slack-bot
+# SPARCS Slack Bot
