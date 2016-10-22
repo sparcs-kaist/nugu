@@ -6,16 +6,30 @@ import string
 import random
 import subprocess
 import os
+import unicodedata
+
+
+def _pad(s, p, r=True):
+    l = 0
+    for c in s:
+        w = unicodedata.east_asian_width(c)
+        l += 2 if w == 'W' else 1
+    if not r:
+        return ' ' * (p - l) + s
+    return s + ' ' * (p - l)
 
 
 def _print_user(users):
-    fmt = '{:10s}{:5s}{:6s}{:6s}{:10s}{:20s}'
-    print('=' * 50)
-    print(fmt.format('학번', '이름', '아이디', 'Github ID', '휴대폰', '소속'))
-    print('-' * 50)
+    fmt = lambda ent_year, name, id, github_id, phone, org: \
+          '{:s}{:s}{:s}{:s}{:s}{:s}'.format(
+                _pad(ent_year, 6), _pad(name, 12), _pad(id, 16),
+                _pad(github_id, 16), _pad(phone, 20), org)
+    print('=' * 80)
+    print(fmt('학번', '이름', '아이디', 'Github ID', '휴대폰', '소속'))
+    print('-' * 80)
     for user in users:
-        print(fmt.format(user.ent_year, user.name, user.id, user.github_id, user.phone, user.org))
-    print('=' * 50)
+        print(fmt(user.ent_year, user.name, user.id, user.github_id, user.phone, user.org))
+    print('=' * 80)
 
 
 def _nugu_list(session):
@@ -32,19 +46,18 @@ def _nugu_get(session, target):
         print('nugu/get: no such user')
         exit(1)
 
-    for i in NUGU_FIELDS:
+    print('=' * 60)
+    for idx, i in enumerate(NUGU_FIELDS):
         value = getattr(user, i['id'])
-        print('%s: %s' % (i['name'], value))
-
+        print('{:3d}. {:s}: {:s}'.format(idx + 1, _pad(i['name'], 15), value))
+    print('=' * 60)
 
 def _nugu_search(session, target):
     if not target:
         print('nugu/search: target is not specified')
         exit(1)
 
-    users = nugu_search(session, target)
-    print('Found %d users' % len(users))
-    _print_user(users)
+    _print_user(nugu_search(session, target))
 
 
 def _nugu_edit(session, target):
