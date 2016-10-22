@@ -1,6 +1,7 @@
 from slacker import Slacker
-from core import nugu
-from models import create_session
+from core import nugu_list, nugu_get, nugu_search, nugu_edit
+from models import create_session, NUGU_FIELDS, NUGU_FIELD_NAMES
+from msg import *
 from settings import TOKEN
 import asyncio
 import json
@@ -9,58 +10,116 @@ import os
 
 
 slack = Slacker(TOKEN)
-session = create_session(DB_PATH)
+session = create_session()
 
-def nugu_core(session, text, email):
-    args = text.split(' ')
+
+def _user_list(users):
+    result = list(map(lambda x: '- %s' % str(x), users))
+    return '\n'.join(result)
+
+
+def _user_info(user):
+    result = [SL_MSG_USER_HEADER % user.id, ]
+    for i in NUGU_FIELDS:
+        value = getattr(user, i['id'])
+        if value:
+            result.append('- %s: %s' % (i['name'], value))
+    return '\n'.join(result)
+
+
+def _nugu_list(session):
+    return _user_list(nugu_list(session))
+
+
+def _nugu_get(session, args):
+    user = nugu_get(session, args[0])
+    if not user:
+        return SL_MSG_SEARCH_NO_RESULT
+    return _user_info(user)
+
+
+def _nugu_search(session, args):
+    if len(args) < 1:
+        return SL_MSG_SEARCH_ARG_REQ
+
+    users = nugu_search(session, args[0])
+    result = SL_MSG_SEARCH_RESULT % len(users)
+    if len(users) == 0:
+        return SL_MSG_SEARCH_NO_RESULT
+    elif len(users) == 1:
+        return _user_info(users[0])
+    elif len(users) > 10:
+        result += ' %s' % SL_MSG_SEARCH_MANY_RESULT
+    result += '\n\n%s' % _user_list(users)
+    return result
+
+
+def _nugu_edit(session, id, args):
     if len(args) < 2:
-        return MSG_HELP
+        return SL_MSG_MODIFY_KEY_REQ
 
-    if args[1].startswith('검색'):
-        return _nugu_search(session, email, args)
-    elif args[1].startswith('수정'):
-        return _nugu_modify(session, email, args)
-    elif args[1].startswith('목록'):
+    user = nugu_get(session, id)
+    if not user:
+        return SL_MSG_MODIFY_NO_USER
+
+    key, value = args[0], ' '.join(args[1:])
+    if key not in NUGU_FIELD_NAMES:
+        return SL_MSG_MODIFY_KEY_INV
+
+    nugu_edit(session, id, {key: value})
+    return SL_MSG_MODIFY_SUCCESS
+
+
+def _nugu_core(session, id, text):
+    args = text.split(' ')[1:]
+    if len(args) < 1:
+        return SL_MSG_HELP
+
+    if args[0].startswith('뀨냥'):
+        return _nugu_get(session, ['samjo', ])
+    elif args[0].startswith('목록'):
         return _nugu_list(session)
-    elif args[1].startswith('뀨냥'):
-        return '냥><'
-    elif args[1].startswith('도움'):
-        return MSG_HELP
-    return _nugu_get(session, email, args)
+    elif args[0].startswith('검색'):
+        return _nugu_search(session, args[1:])
+    elif args[0].startswith('수정'):
+        return _nugu_edit(session, id, args[1:])
+    elif args[0].startswith('도움'):
+        return SL_MSG_HELP
+    return _nugu_get(session, args)
 
 
-def nugu(session, text, email):
+def _nugu(session, text, email):
     try:
         return _nugu_core(session, text, email)
     except Exception as e:
-        return MSG_ERROR % str(e)
-
-def _parse_email(email):
-    e = email.split('@')
-    if len(e) != 2:
-        return False, ''
-    if e[1] == 'sparcs.org':
-        return True, e[0]
-    return False, ''
+        return SL_MSG_ERROR % str(e)
 
 
-def _get_email(userid):
+def _get_id(userid):
     result = slack.users.info(userid).body
-    return result['user']['profile']['email']
+    email = result['user']['profile']['email']
+    email_part = email.split('@')
+    if len(email_part) != 2 or email_part[1] != 'sparcs.org':
+        return None
+    return email_part[0]
 
 
 def handle(message):
     resp = ''
+    if message['type'] != 'message' or \
+            ('user' not in message or 'text' not in message):
+        return
 
-    if message['type'] == 'message' and \
-            'user' in message and 'text' in message:
-        text = message['text']
-        channel = message['channel']
-        if text.startswith('!누구'):
-            email = _get_email(message['user'])
-            resp = nugu(session, text, email)
+    text, channel = message['text'], message['channel']
+    if not text.startswith('!누구') and not text.startswith('!nugu'):
+        return
 
-    if resp != '':
+    id = _get_id(message['user'])
+    if not id:
+        return
+
+    resp = _nugu(session, id, text)
+    if resp:
         slack.chat.post_message(channel=channel, text=resp)
 
 
