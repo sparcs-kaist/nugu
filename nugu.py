@@ -20,10 +20,10 @@ def _pad(s, p, r=True):
 
 
 def _print_user(users):
-    fmt = lambda ent_year, name, id, github_id, phone, org: \
-          '{:s}{:s}{:s}{:s}{:s}{:s}'.format(
-                _pad(ent_year, 6), _pad(name, 12), _pad(id, 16),
-                _pad(github_id, 16), _pad(phone, 20), org)
+    def fmt(ent_year, name, id, github_id, phone, org):
+        return '{:s}{:s}{:s}{:s}{:s}{:s}'.format(
+            _pad(ent_year, 6), _pad(name, 12), _pad(id, 16),
+            _pad(github_id, 16), _pad(phone, 20), org)
     print('=' * 80)
     print(fmt('학번', '이름', '아이디', 'Github ID', '휴대폰', '소속'))
     print('-' * 80)
@@ -52,6 +52,7 @@ def _nugu_get(session, target):
         print('{:3d}. {:s}: {:s}'.format(idx + 1, _pad(i['name'], 15), value))
     print('=' * 60)
 
+
 def _nugu_search(session, target):
     if not target:
         print('nugu/search: target is not specified')
@@ -77,7 +78,6 @@ def _nugu_edit(session, target):
     if user and not is_root and id != logged_user:
         print('nugu/edit: root permission is required to edit others')
         exit(1)
-
 
     json_str = user.to_json() if user else User.default_json()
     random_str = ''.join(random.choice(string.digits) for _ in range(6))

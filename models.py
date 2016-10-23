@@ -46,7 +46,6 @@ class User(Base):
     battlenet_id = Column(String(255), nullable=True)
     website = Column(String(255), nullable=True)
 
-
     @staticmethod
     def _gen_json(value_func):
         result = ['{', ]
@@ -75,4 +74,3 @@ def create_session():
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     return DBSession()
-

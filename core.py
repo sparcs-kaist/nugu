@@ -8,11 +8,11 @@ DB_PATH = os.path.join(BASE_PATH, 'db.sqlite3')
 
 
 def nugu_list(session):
-    return session.query(User).all()
+    return session.query(User).order_by(User.ent_year, User.id).all()
 
 
 def nugu_get(session, id):
-    users = session.query(User).filter(User.id==id).all()
+    users = session.query(User).filter(User.id == id).all()
     if len(users) == 0:
         return None
     return users[0]
@@ -20,13 +20,14 @@ def nugu_get(session, id):
 
 def nugu_search(session, text):
     query = '%%%s%%' % text
-    users = session.query(User).filter(User.id.like(query) |
-                                       User.name.like(query)).all()
+    users = session.query(User).\
+        filter(User.id.like(query) | User.name.like(query)).\
+        order_by(User.ent_year.desc(), User.id).all()
     return users
 
 
 def nugu_edit(session, id, info):
-    users = session.query(User).filter(User.id==id).all()
+    users = session.query(User).filter(User.id == id).all()
     if len(users) == 0:
         user = User(id=id)
     else:
@@ -41,7 +42,7 @@ def nugu_edit(session, id, info):
 
 
 def nugu_remove(session, id):
-    users = session.query(User).filter(User.id==id).all()
+    users = session.query(User).filter(User.id == id).all()
     if len(users) == 0:
         return
 
