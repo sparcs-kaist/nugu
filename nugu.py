@@ -1,5 +1,6 @@
 from core import nugu_list, nugu_get, nugu_search, nugu_edit, nugu_remove
 from models import create_session, User, NUGU_FIELDS
+from datetime import datetime, timedelta
 import argparse
 import json
 import string
@@ -19,7 +20,7 @@ def _pad(s, p, r=True):
     return s + ' ' * (p - l)
 
 
-def _print_user(users):
+def _print_list(users):
     def fmt(ent_year, name, id, github_id, phone, org):
         return '{:s}{:s}{:s}{:s}{:s}{:s}'.format(
             _pad(ent_year, 6), _pad(name, 12), _pad(id, 16),
@@ -33,7 +34,7 @@ def _print_user(users):
 
 
 def _nugu_list(session):
-    _print_user(nugu_list(session))
+    _print_list(nugu_list(session))
 
 
 def _nugu_get(session, target):
@@ -49,6 +50,8 @@ def _nugu_get(session, target):
     print('=' * 60)
     for idx, i in enumerate(NUGU_FIELDS):
         value = getattr(user, i['id'])
+        if type(value) == datetime:
+            value = (value + timedelta(hours=9)).isoformat() + 'KST'
         print('{:3d}. {:s}: {:s}'.format(idx + 1, _pad(i['name'], 15), value))
     print('=' * 60)
 
@@ -58,7 +61,7 @@ def _nugu_search(session, target):
         print('nugu/search: target is not specified')
         exit(1)
 
-    _print_user(nugu_search(session, target))
+    _print_list(nugu_search(session, target))
 
 
 def _nugu_edit(session, target):

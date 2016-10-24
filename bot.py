@@ -3,6 +3,7 @@ from core import nugu_list, nugu_get, nugu_search, nugu_edit
 from models import create_session, NUGU_FIELDS, NUGU_FIELD_NAMES
 from msg import *
 from settings import TOKEN
+from datetime import datetime, timedelta
 import asyncio
 import json
 import websockets
@@ -22,8 +23,11 @@ def _user_info(user):
     result = [SL_MSG_USER_HEADER % user.id, ]
     for i in NUGU_FIELDS:
         value = getattr(user, i['id'])
-        if value:
-            result.append('- %s: %s' % (i['name'], value))
+        if not value:
+            continue
+        if type(value) == datetime:
+            value = (value + timedelta(hours=9)).isoformat() + 'KST'
+        result.append('- %s: %s' % (i['name'], value))
     return '\n'.join(result)
 
 

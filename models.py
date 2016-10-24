@@ -1,6 +1,7 @@
-from sqlalchemy import Table, Column, ForeignKey, Integer, String, Date
+from sqlalchemy import Table, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.sql import func
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import os
 
@@ -13,14 +14,20 @@ NUGU_FIELDS = [
     {'id': 'phone', 'name': '전화번호', 'hint': '010-xxxx-xxxx'},
     {'id': 'birth', 'name': '생일', 'hint': '1996-01-01'},
     {'id': 'dorm', 'name': '기숙사'},
+    {'id': 'lab', 'name': '랩'},
     {'id': 'home_add', 'name': '집주소'},
     {'id': 'facebook_id', 'name': 'Facebook ID'},
     {'id': 'twitter_id', 'name': 'Twitter ID'},
     {'id': 'github_id', 'name': 'Github ID'},
     {'id': 'battlenet_id', 'name': 'Battlenet ID'},
     {'id': 'website', 'name': '홈페이지'},
+    {'id': 'blog', 'name': '블로그'},
+    {'id': 'created_on', 'name': '생성일', 'readonly': True},
+    {'id': 'updated_on', 'name': '수정일', 'readonly': True},
 ]
-NUGU_FIELD_NAMES = list(map(lambda i: i['id'], NUGU_FIELDS))
+NUGU_FIELD_NAMES = list(map(lambda i: i['id'],
+                            filter(lambda i: not i.get('readonly', False),
+                                   NUGU_FIELDS)))
 
 
 Base = declarative_base()
@@ -45,11 +52,15 @@ class User(Base):
     github_id = Column(String(255), nullable=True)
     battlenet_id = Column(String(255), nullable=True)
     website = Column(String(255), nullable=True)
+    created_on = Column(DateTime, server_default=func.now())
+    updated_on = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     @staticmethod
     def _gen_json(value_func):
         result = ['{', ]
         for i in NUGU_FIELDS:
+            if i.get('readonly', False):
+                continue
             result.append('    "%s": "%s",' % (i['id'], value_func(i)))
         result[-1] = result[-1][:-1]
         result.append('}')
