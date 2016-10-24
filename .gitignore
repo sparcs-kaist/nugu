@@ -93,3 +93,6 @@ ENV/
 
 # settings
 settings.py
+
+# nugu wrapper
+nugu

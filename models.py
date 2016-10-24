@@ -84,7 +84,7 @@ class User(Base):
 def create_session():
     uri = 'sqlite:///%s' % DB_PATH
     if not DEBUG:
-        uri = 'mysql://%s:%s@localhost/nugu' % (DB_USER_ID, DB_USER_PW)
+        uri = 'mysql://%s:%s@localhost/nugu?charset=utf8' % (DB_USER_ID, DB_USER_PW)
 
     engine = create_engine(uri)
     if DEBUG and not os.path.exists(DB_PATH):
