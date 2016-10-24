@@ -1,8 +1,9 @@
 from sqlalchemy import Table, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from settings import DB_USER_ID, DB_USER_PW
+from datetime import datetime
 import os
 
 
@@ -33,6 +34,7 @@ NUGU_FIELD_NAMES = list(map(lambda i: i['id'],
 Base = declarative_base()
 LIB_PATH = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(LIB_PATH, 'db.sqlite3')
+DEBUG = not os.path.exists(os.path.join(LIB_PATH, 'deploy'))
 
 
 class User(Base):
@@ -46,14 +48,16 @@ class User(Base):
     phone = Column(String(255), nullable=True)
     birth = Column(String(255), nullable=True)
     dorm = Column(String(255), nullable=True)
+    lab = Column(String(255), nullable=True)
     home_add = Column(String(255), nullable=True)
     facebook_id = Column(String(255), nullable=True)
     twitter_id = Column(String(255), nullable=True)
     github_id = Column(String(255), nullable=True)
     battlenet_id = Column(String(255), nullable=True)
     website = Column(String(255), nullable=True)
-    created_on = Column(DateTime, server_default=func.now())
-    updated_on = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    blog = Column(String(255), nullable=True)
+    created_on = Column(DateTime, default=datetime.utcnow)
+    updated_on = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @staticmethod
     def _gen_json(value_func):
@@ -78,8 +82,12 @@ class User(Base):
 
 
 def create_session():
-    engine = create_engine('sqlite:///%s' % DB_PATH)
-    if not os.path.exists(DB_PATH):
+    uri = 'sqlite:///%s' % DB_PATH
+    if not DEBUG:
+        uri = 'mysql://%s:%s@localhost/nugu' % (DB_USER_ID, DB_USER_PW)
+
+    engine = create_engine(uri)
+    if DEBUG and not os.path.exists(DB_PATH):
         Base.metadata.create_all(engine)
 
     Base.metadata.bind = engine
