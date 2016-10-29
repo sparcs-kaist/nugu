@@ -35,7 +35,7 @@ def nugu_edit(session, id, info):
 
     for k, v in info.items():
         if k in NUGU_FIELD_NAMES:
-            setattr(user, k, v)
+            setattr(user, k, v.strip())
 
     session.add(user)
     session.commit()
@@ -48,3 +48,8 @@ def nugu_remove(session, id):
 
     session.delete(users[0])
     session.commit()
+
+
+def nugu_battlenet(session):
+    return session.query(User).filter(User.battlenet_id != None,
+                                      User.battlenet_id != '').all()

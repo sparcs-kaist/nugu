@@ -75,7 +75,7 @@ class User(Base):
         return User._gen_json(lambda i: i.get('hint', ''))
 
     def to_json(self):
-        return self._gen_json(lambda i: getattr(self, i['id']))
+        return self._gen_json(lambda i: getattr(self, i['id']) or "")
 
     def __str__(self):
         return u'%s (%s, %s)' % (self.id, self.name, self.ent_year)

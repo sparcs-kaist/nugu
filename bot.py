@@ -1,5 +1,5 @@
 from slacker import Slacker
-from core import nugu_list, nugu_get, nugu_search, nugu_edit
+from core import nugu_list, nugu_get, nugu_search, nugu_edit, nugu_battlenet
 from models import create_session, NUGU_FIELDS, NUGU_FIELD_NAMES
 from msg import *
 from settings import TOKEN
@@ -31,10 +31,6 @@ def _user_info(user):
     return '\n'.join(result)
 
 
-def _nugu_list(session):
-    return _user_list(nugu_list(session))
-
-
 def _nugu_get(session, args):
     user = nugu_get(session, args[0])
     if not user:
@@ -54,6 +50,7 @@ def _nugu_search(session, args):
         return _user_info(users[0])
     elif len(users) > 10:
         result += ' %s' % SL_MSG_SEARCH_MANY_RESULT
+        users = users[:10]
     result += '\n\n%s' % _user_list(users)
     return result
 
@@ -74,6 +71,12 @@ def _nugu_edit(session, id, args):
     return SL_MSG_MODIFY_SUCCESS
 
 
+def _nugu_battlenet(session):
+    users = nugu_battlenet(session)
+    result = list(map(lambda x: '%s (%s, %s)' % (x.battlenet_id, x.name, x.ent_year), users))
+    return '%s\n%s' % (SL_MSG_BATTLENET, ', '.join(result))
+
+
 def _nugu_core(session, id, text):
     args = text.split(' ')[1:]
     if len(args) < 1:
@@ -81,12 +84,12 @@ def _nugu_core(session, id, text):
 
     if args[0].startswith('뀨냥'):
         return _nugu_get(session, ['samjo', ])
-    elif args[0].startswith('목록'):
-        return _nugu_list(session)
     elif args[0].startswith('검색'):
         return _nugu_search(session, args[1:])
     elif args[0].startswith('수정'):
         return _nugu_edit(session, id, args[1:])
+    elif args[0].startswith('배틀넷'):
+        return _nugu_battlenet(session)
     elif args[0].startswith('도움'):
         return SL_MSG_HELP
     return _nugu_get(session, args)
@@ -101,7 +104,7 @@ def _nugu(session, text, email):
 
 def _get_id(userid):
     result = slack.users.info(userid).body
-    email = result['user']['profile']['email']
+    email = result['user']['profile'].get('email', '')
     email_part = email.split('@')
     if len(email_part) != 2 or email_part[1] != 'sparcs.org':
         return None
@@ -124,7 +127,7 @@ def handle(message):
 
     resp = _nugu(session, id, text)
     if resp:
-        slack.chat.post_message(channel=channel, text=resp)
+        slack.chat.post_message(channel=channel, text=resp, as_user=True)
 
 
 async def bot(endpoint):

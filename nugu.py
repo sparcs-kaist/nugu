@@ -11,6 +11,7 @@ import unicodedata
 
 
 def _pad(s, p, r=True):
+    s = '' if s is None else s
     l = 0
     for c in s:
         w = unicodedata.east_asian_width(c)
@@ -50,6 +51,7 @@ def _nugu_get(session, target):
     print('=' * 60)
     for idx, i in enumerate(NUGU_FIELDS):
         value = getattr(user, i['id'])
+        value = '' if value is None else value
         if type(value) == datetime:
             value = (value + timedelta(hours=9)).isoformat() + 'KST'
         print('{:3d}. {:s}: {:s}'.format(idx + 1, _pad(i['name'], 15), value))
