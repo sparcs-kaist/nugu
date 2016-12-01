@@ -86,7 +86,7 @@ def create_session():
     if not DEBUG:
         uri = 'mysql://%s:%s@localhost/nugu?charset=utf8' % (DB_USER_ID, DB_USER_PW)
 
-    engine = create_engine(uri)
+    engine = create_engine(uri, pool_recycle=200)
     if DEBUG and not os.path.exists(DB_PATH):
         Base.metadata.create_all(engine)
 

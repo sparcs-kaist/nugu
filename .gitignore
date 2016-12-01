@@ -96,3 +96,7 @@ settings.py
 
 # nugu wrapper
 nugu
+
+# error, pid file
+*.err
+*.pid

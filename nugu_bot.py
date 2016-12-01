@@ -67,6 +67,10 @@ def _nugu_edit(session, id, args):
     if key not in NUGU_FIELD_NAMES:
         return SL_MSG_MODIFY_KEY_INV
 
+    if key in ['website', 'url']:
+        if value[0] == '<':
+            value = value[1:value.find('|')]
+
     nugu_edit(session, id, {key: value})
     return SL_MSG_MODIFY_SUCCESS
 
@@ -113,7 +117,7 @@ def _get_id(userid):
 
 def handle(message):
     resp = ''
-    if message['type'] != 'message' or \
+    if message.get('type', '') != 'message' or \
             ('user' not in message or 'text' not in message):
         return
 
