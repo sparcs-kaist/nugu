@@ -11,7 +11,6 @@ import os
 
 
 slack = Slacker(TOKEN)
-session = create_session()
 
 
 def _user_list(users):
@@ -129,7 +128,9 @@ def handle(message):
     if not id:
         return
 
+    session = create_session()
     resp = _nugu(session, id, text)
+    session.close()
     if resp:
         slack.chat.post_message(channel=channel, text=resp, as_user=True)
 
