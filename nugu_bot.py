@@ -136,11 +136,15 @@ def handle(message):
 
 
 async def bot(endpoint):
-    ws = await websockets.connect(endpoint)
     while True:
-        message = await ws.recv()
-        message = json.loads(message)
-        handle(message)
+        try:
+            ws = await websockets.connect(endpoint)
+            while True:
+                message = await ws.recv()
+                message = json.loads(message)
+                handle(message)
+        except:
+            pass
 
 
 def main():
