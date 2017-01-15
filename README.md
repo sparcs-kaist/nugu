@@ -18,11 +18,13 @@ exec python -m nugu.cli $@
 
 ### Slack bot using supervisord
 
-Add the following as `/etc/supervisor/conf.d/nugu.conf`.
+Add the following as `/etc/supervisor/conf.d/nugu.conf` after modifying
+the paths to match with your setup.
 
 ```dosini
 [app:nugu]
 command=/SPARCS/nugu/run_bot.sh
+environment=NUGU_VENV="/SPARCS/nugu/venv"
 directory=/SPARCS/nugu
 stopasgroup=true
 killasgroup=true
