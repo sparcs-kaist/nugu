@@ -94,9 +94,9 @@ ENV/
 # settings
 settings.py
 
-# nugu wrapper
-nugu
-
 # error, pid file
 *.err
 *.pid
+
+# vim swap files
+.*.swp

@@ -1,6 +1,7 @@
-from models import User, NUGU_FIELD_NAMES
 import json
 import os
+
+from .models import User, NUGU_FIELD_NAMES
 
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
