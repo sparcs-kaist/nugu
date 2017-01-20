@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-from .settings import DB_USER_ID, DB_USER_PW
+from .settings import DB_URL, DEBUG
 
 
 NUGU_FIELDS = [
@@ -29,15 +29,11 @@ NUGU_FIELDS = [
     {'id': 'created_on', 'name': '생성일', 'readonly': True},
     {'id': 'updated_on', 'name': '수정일', 'readonly': True},
 ]
-NUGU_FIELD_NAMES = list(map(lambda i: i['id'],
-                            filter(lambda i: not i.get('readonly', False),
-                                   NUGU_FIELDS)))
 
+NUGU_FIELD_NAMES = [field['id'] for field in NUGU_FIELDS
+                    if not field.get('readonly', False)]
 
 Base = declarative_base()
-LIB_PATH = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(LIB_PATH, 'db.sqlite3')
-DEBUG = not os.path.exists(os.path.join(LIB_PATH, 'deploy'))
 
 
 class User(Base):
@@ -85,14 +81,9 @@ class User(Base):
 
 
 def create_session():
-    uri = 'sqlite:///%s' % DB_PATH
-    if not DEBUG:
-        uri = 'mysql://%s:%s@localhost/nugu?charset=utf8' % (DB_USER_ID, DB_USER_PW)
-
-    engine = create_engine(uri, pool_recycle=100)
-    if DEBUG and not os.path.exists(DB_PATH):
+    engine = create_engine(DB_URL, pool_recycle=100)
+    if not engine.dialect.has_table(engine, User.__tablename__):
         Base.metadata.create_all(engine)
-
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     return DBSession()

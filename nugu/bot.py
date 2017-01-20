@@ -6,13 +6,13 @@ import os
 from slacker import Slacker
 import websockets
 
-from .settings import TOKEN
+from .settings import SLACK_TOKEN
 from .core import nugu_list, nugu_get, nugu_search, nugu_edit, nugu_battlenet
 from .models import create_session, NUGU_FIELDS, NUGU_FIELD_NAMES
 from .msg import *
 
 
-slack = Slacker(TOKEN)
+slack = None
 
 
 def _user_list(users):
@@ -150,16 +150,25 @@ async def bot(endpoint):
 
 
 def main():
+    global slack
+
+    if SLACK_TOKEN is None:
+        print('nugu.bot: Please set NUGU_SLACK_TOKEN environment variable.', file=sys.stderr)
+        exit(1)
+
+    slack = Slacker(SLACK_TOKEN)
     response = slack.rtm.start()
     endpoint = response.body.get('url', '')
     if not endpoint:
-        print('main: cannot get endpoint; server sent=%s' % response)
+        print('nugu.bot: cannot get Slack API endpoint; server sent=%s' % response)
         exit(1)
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    asyncio.get_event_loop().run_until_complete(bot(endpoint))
-    asyncio.get_event_loop().run_forever()
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(bot(endpoint))
+        loop.run_forever()
+    finally:
+        loop.close()
 
 
 if __name__ == '__main__':
