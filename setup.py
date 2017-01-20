@@ -1,4 +1,17 @@
 from setuptools import setup
+from pathlib import Path
+import re
+
+here = Path(__file__).resolve().parent
+
+
+def _get_version():
+    root_src = (here / 'nugu' / '__init__.py').read_text()
+    try:
+        version = re.findall(r"^__version__ = '([^']+)'\r?$", root_src, re.M)[0]
+    except IndexError:
+        raise RuntimeError('Unable to determine myself version.')
+    return version
 
 
 setup(
@@ -7,9 +20,9 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.0',
+    version=_get_version(),
     description='Nugu',
-    long_description='SPARCS Nugu Manager',
+    long_description='SPARCS Address Book',
     url='https://github.com/sparcs-kaist/nugu',
     author='SPARCS Wheel',
     author_email='samjo@sparcs.org',
@@ -35,6 +48,8 @@ setup(
         'slacker==0.9.28',
         'SQLAlchemy==1.1.2',
         'websockets==3.2',
+        'yarl==0.8.1',
+        'mysqlclient==1.3.9',
     ],
     extras_require={
         'dev': ['pytest', 'flake8', 'pep8-naming'],

@@ -7,6 +7,7 @@ import random
 import subprocess
 import unicodedata
 
+from . import __version__ as _version, __author__ as _author
 from .core import nugu_list, nugu_get, nugu_search, nugu_edit, nugu_remove
 from .models import create_session, User, NUGU_FIELDS
 
@@ -125,7 +126,9 @@ def _nugu_remove(session, target):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='SPARCS nugu by samjo, netj')
+    title = 'SPARCS nugu v{} by {}'.format(_version, _author)
+
+    parser = argparse.ArgumentParser(description=title)
     parser.add_argument('target', nargs='?', help='검색할 ID 또는 이름입니다.')
     parser.add_argument('-l', '--list', action='store_true', help='전체 사용자의 목록을 출력합니다.')
     parser.add_argument('-s', '--search', action='store_true', help='ID/이름에 검색어가 들어있는 사용자를 찾습니다.')
@@ -134,7 +137,7 @@ def main():
     args = parser.parse_args()
     session = create_session()
 
-    print('SPARCS nugu v0.5 by samjo, netj')
+    print(title)
     print()
 
     if args.list:
