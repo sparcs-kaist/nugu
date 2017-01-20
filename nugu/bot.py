@@ -155,7 +155,7 @@ async def bot(endpoint):
         except:
             log.exception('unexpected error')
             print('reconnecting...', file=sys.stderr)
-            break
+            continue
 
 
 def main():
