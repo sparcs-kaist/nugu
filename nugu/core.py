@@ -4,10 +4,6 @@ import os
 from .models import User, NUGU_FIELD_NAMES
 
 
-BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_PATH, 'db.sqlite3')
-
-
 def nugu_list(session):
     return session.query(User).order_by(User.ent_year, User.id).all()
 
