@@ -6,6 +6,24 @@
 
 ## Installation
 
+### Prerequisite
+
+* On Debin/Ubuntu Linux
+  - `apt-get install libmysqlclient-dev`
+
+* On MacOS
+  - `brew install mysql --client-only --universal`
+
+### The main package
+
+For developemnt or as an editable package inside a virtual environment:
+```bash
+source $NUGU_VENV/bin/activate
+pip install -e .
+```
+
+## Configuration
+
 ### Command
 
 Add the following as `/SPARCS/bin/nugu`
