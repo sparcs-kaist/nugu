@@ -1,10 +1,7 @@
-from models import User, NUGU_FIELD_NAMES
 import json
 import os
 
-
-BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_PATH, 'db.sqlite3')
+from .models import User, NUGU_FIELD_NAMES
 
 
 def nugu_list(session):

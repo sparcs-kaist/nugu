@@ -1,4 +1,4 @@
-from models import NUGU_FIELD_NAMES
+from .models import NUGU_FIELD_NAMES
 
 SL_MSG_FIELDS = ', '.join(NUGU_FIELD_NAMES)
 SL_MSG_ERROR = "!누구 아프냥... %s"

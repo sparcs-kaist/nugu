@@ -1,16 +1,23 @@
-from slacker import Slacker
-from core import nugu_list, nugu_get, nugu_search, nugu_edit, nugu_battlenet
-from models import create_session, NUGU_FIELDS, NUGU_FIELD_NAMES
-from msg import *
-from settings import TOKEN
-from datetime import datetime, timedelta
 import asyncio
+from datetime import datetime, timedelta
 import json
-import websockets
+import logging
 import os
+import signal
+import sys
+
+import slacker
+import websockets
+
+from .settings import SLACK_TOKEN
+from .core import nugu_list, nugu_get, nugu_search, nugu_edit, nugu_battlenet
+from .models import create_session, NUGU_FIELDS, NUGU_FIELD_NAMES
+from .msg import *
 
 
-slack = Slacker(TOKEN)
+log = logging.getLogger(__name__)
+
+slack = None
 
 
 def _user_list(users):
@@ -114,7 +121,7 @@ def _get_id(userid):
     return email_part[0]
 
 
-def handle(message):
+def handle_chat(message):
     resp = ''
     if message.get('type', '') != 'message' or \
             ('user' not in message or 'text' not in message):
@@ -138,26 +145,59 @@ def handle(message):
 async def bot(endpoint):
     while True:
         try:
-            ws = await websockets.connect(endpoint)
-            while True:
-                message = await ws.recv()
-                message = json.loads(message)
-                handle(message)
+            async with websockets.connect(endpoint) as ws:
+                while True:
+                    message = await ws.recv()
+                    message = json.loads(message)
+                    handle_chat(message)
+        except asyncio.CancelledError:
+            break
         except:
-            pass
+            log.exception('unexpected error')
+            print('reconnecting...', file=sys.stderr)
+            continue
 
 
 def main():
-    response = slack.rtm.start()
-    endpoint = response.body.get('url', '')
-    if not endpoint:
-        print('main: cannot get endpoint; server sent=%s' % response)
+    global slack
+
+    if SLACK_TOKEN is None:
+        print('nugu.bot: Please set NUGU_SLACK_TOKEN environment variable.', file=sys.stderr)
         exit(1)
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    asyncio.get_event_loop().run_until_complete(bot(endpoint))
-    asyncio.get_event_loop().run_forever()
+    slack = slacker.Slacker(SLACK_TOKEN)
+    try:
+        response = slack.rtm.start()
+        endpoint = response.body.get('url', '')
+        if not endpoint:
+            print('nugu.bot: cannot get Slack API endpoint; server sent={!r}'.format(response), file=sys.stderr)
+            exit(1)
+    except slacker.Error as e:
+        print('nugu.bot: Slack API error ({})'.format(e))
+        exit(1)
+
+    def handle_interrupt(loop, term_event):
+        if term_event.is_set():
+            print('nugu.bot: forced shutdown.', file=sys.stderr)
+            sys.exit(1)
+        else:
+            loop.stop()
+            term_event.set()
+
+    loop = asyncio.get_event_loop()
+    term_event = asyncio.Event()
+    loop.add_signal_handler(signal.SIGINT, handle_interrupt, loop, term_event)
+    loop.add_signal_handler(signal.SIGTERM, handle_interrupt, loop, term_event)
+    try:
+        print('nugu.bot: running...')
+        bot_task = loop.create_task(bot(endpoint))
+        loop.run_forever()
+        # if interrupted...
+        bot_task.cancel()
+        loop.run_until_complete(bot_task)
+    finally:
+        loop.close()
+        print('nugu.bot: terminated.')
 
 
 if __name__ == '__main__':
