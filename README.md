@@ -51,8 +51,9 @@ Add the following as `/etc/supervisor/conf.d/nugu.conf` after modifying
 the paths to match with your setup.
 
 ```dosini
-[app:nugu]
+[program:nugu]
 command=/SPARCS/nugu/run_bot.sh
+user=slack-bot
 environment=NUGU_VENV="/SPARCS/nugu/venv"
 directory=/SPARCS/nugu
 stopasgroup=true
