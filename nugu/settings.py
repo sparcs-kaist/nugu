@@ -34,7 +34,11 @@ else:
     DB_NAME = 'nugu'
     DB_OPTS = {'charset': 'utf8'}
 
-DB_URL = URL('{}'.format(DB_HOST))
+if DB_TYPE == 'sqlite':
+    DB_URL = URL('{}'.format(DB_HOST))
+elif DB_TYPE == 'mysql':
+    DB_URL = URL('{}://{}'.format(DB_TYPE, DB_HOST))
+
 if DB_USER_ID:
     DB_URL = DB_URL.with_user(DB_USER_ID)
 if DB_USER_PW:
@@ -43,4 +47,8 @@ if DB_NAME:
     DB_URL = DB_URL / DB_NAME
 if DB_OPTS:
     DB_URL = DB_URL.with_query(DB_OPTS)
-DB_URL = '{}://'.format(DB_TYPE) + str(DB_URL)
+
+if DB_TYPE == 'sqlite':
+    DB_URL = '{}://'.format(DB_TYPE) + str(DB_URL)
+elif DB_TYPE == 'mysql':
+    DB_URL = str(DB_URL)
