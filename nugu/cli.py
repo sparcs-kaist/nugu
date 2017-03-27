@@ -3,8 +3,6 @@ from datetime import datetime, timedelta
 import json
 import os
 from pathlib import Path
-import random
-import string
 import subprocess
 import sys
 import tempfile
@@ -90,7 +88,6 @@ def do_edit(session, target):
         exit(1)
 
     json_str = user.to_json() if user else User.default_json()
-    random_str = ''.join(random.choice(string.digits) for _ in range(6))
 
     changed = False
     try:

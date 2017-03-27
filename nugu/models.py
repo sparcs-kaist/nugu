@@ -1,13 +1,11 @@
 from datetime import datetime
-import os
 
-from sqlalchemy import (Table, Column, ForeignKey,
-                        Integer, String, DateTime)
+from sqlalchemy import (Column, String, DateTime)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-from .settings import DB_URL, DEBUG
+from .settings import DB_URL
 
 
 NUGU_FIELDS = [

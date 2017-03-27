@@ -2,7 +2,6 @@ import asyncio
 from datetime import datetime, timedelta
 import json
 import logging
-import os
 import signal
 import sys
 
@@ -10,7 +9,7 @@ import slacker
 import websockets
 
 from .settings import SLACK_TOKEN
-from .core import nugu_list, nugu_get, nugu_search, nugu_edit, nugu_battlenet
+from .core import nugu_get, nugu_search, nugu_edit, nugu_battlenet
 from .models import create_session, NUGU_FIELDS, NUGU_FIELD_NAMES
 from .msg import *
 

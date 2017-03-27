@@ -1,6 +1,3 @@
-import json
-import os
-
 from .models import User, NUGU_FIELD_NAMES
 
 
