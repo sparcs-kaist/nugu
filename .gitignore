@@ -62,3 +62,6 @@ ENV/
 
 # vim swap files
 .*.swp
+
+# JetBrains(PyCharm)
+.idea/
