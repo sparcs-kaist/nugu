@@ -10,6 +10,8 @@ from .settings import DB_URL
 
 NUGU_FIELDS = [
     {'id': 'name', 'name': '이름', 'hint': '뀨냥이'},
+    {'id': 'is_developer', 'name': '개발자인가', 'hint': 'false'},
+    {'id': 'is_designer', 'name': '디자이너인가', 'hint': 'false'},
     {'id': 'ent_year', 'name': '학번', 'hint': '14'},
     {'id': 'org', 'name': '소속'},
     {'id': 'email', 'name': '이메일'},
@@ -18,9 +20,11 @@ NUGU_FIELDS = [
     {'id': 'dorm', 'name': '기숙사'},
     {'id': 'lab', 'name': '랩'},
     {'id': 'home_add', 'name': '집주소'},
+    {'id': 'github_id', 'name': 'Github ID'},
+    {'id': 'linkedin_url', 'name': 'LinkedIn URL'},
+    {'id': 'behance_url', 'name': 'Behance URL'},
     {'id': 'facebook_id', 'name': 'Facebook ID'},
     {'id': 'twitter_id', 'name': 'Twitter ID'},
-    {'id': 'github_id', 'name': 'Github ID'},
     {'id': 'battlenet_id', 'name': 'Battlenet ID'},
     {'id': 'website', 'name': '홈페이지'},
     {'id': 'blog', 'name': '블로그'},
@@ -39,6 +43,8 @@ class User(Base):
 
     id = Column(String(30), primary_key=True)
     name = Column(String(255), nullable=True)
+    is_developer = Column(default=True)
+    is_designer = Column(default=False)
     ent_year = Column(String(255), nullable=True)
     org = Column(String(255), nullable=True)
     email = Column(String(255), nullable=True)
@@ -47,9 +53,11 @@ class User(Base):
     dorm = Column(String(255), nullable=True)
     lab = Column(String(255), nullable=True)
     home_add = Column(String(255), nullable=True)
+    github_id = Column(String(255), nullable=True)
+    linkedin_url = Column(String(255), nullable=True)
+    behance_url = Column(String(255), nullable=True)
     facebook_id = Column(String(255), nullable=True)
     twitter_id = Column(String(255), nullable=True)
-    github_id = Column(String(255), nullable=True)
     battlenet_id = Column(String(255), nullable=True)
     website = Column(String(255), nullable=True)
     blog = Column(String(255), nullable=True)

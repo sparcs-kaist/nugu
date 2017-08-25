@@ -57,7 +57,7 @@ def do_get(session, target):
         value = '' if value is None else value
         if type(value) == datetime:
             value = (value + timedelta(hours=9)).isoformat() + 'KST'
-        print('{:3d}. {:s}: {:s}'.format(idx + 1, _pad(i['name'], 15), value))
+        print('{:3d}. {:s}: {:s}'.format(idx + 1, _pad(i['name'], 15), str(value)))
     print('=' * 60)
 
 
