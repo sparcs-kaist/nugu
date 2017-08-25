@@ -12,6 +12,7 @@ NUGU_FIELDS = [
     {'id': 'name', 'name': '이름', 'hint': '뀨냥이'},
     {'id': 'is_developer', 'name': '개발자인가', 'hint': '0 or 1'},
     {'id': 'is_designer', 'name': '디자이너인가', 'hint': '0 or 1'},
+    {'id': 'is_undergraduate', 'name': '학부생인가', 'hint': '0 or 1'},
     {'id': 'ent_year', 'name': '학번', 'hint': '14'},
     {'id': 'org', 'name': '소속'},
     {'id': 'email', 'name': '이메일'},
