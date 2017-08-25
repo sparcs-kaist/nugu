@@ -46,6 +46,7 @@ class User(Base):
     name = Column(String(255), nullable=True)
     is_developer = Column(default=True)
     is_designer = Column(default=False)
+    is_undergraduate = Column(default=False)
     ent_year = Column(String(255), nullable=True)
     org = Column(String(255), nullable=True)
     email = Column(String(255), nullable=True)
