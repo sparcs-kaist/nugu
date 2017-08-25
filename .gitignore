@@ -65,3 +65,5 @@ ENV/
 
 # JetBrains(PyCharm)
 .idea/
+
+.DS_Store
