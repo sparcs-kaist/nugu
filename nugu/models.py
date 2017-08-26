@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import (Column, String, DateTime)
+from sqlalchemy import (Boolean, Column, DateTime, String)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -44,9 +44,9 @@ class User(Base):
 
     id = Column(String(30), primary_key=True)
     name = Column(String(255), nullable=True)
-    is_developer = Column(default=True)
-    is_designer = Column(default=False)
-    is_undergraduate = Column(default=False)
+    is_developer = Column(Boolean, default=True)
+    is_designer = Column(Boolean, default=False)
+    is_undergraduate = Column(Boolean, default=True)
     ent_year = Column(String(255), nullable=True)
     org = Column(String(255), nullable=True)
     email = Column(String(255), nullable=True)
