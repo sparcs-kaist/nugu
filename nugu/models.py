@@ -20,7 +20,7 @@ NUGU_FIELDS = [
         'name': '외부 비공개',
         'hint': 'y or n',
         'type': Boolean,
-        'default': False
+        'default': True
     },
     {
         'id': 'is_developer',
