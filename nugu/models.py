@@ -17,7 +17,7 @@ NUGU_FIELDS = [
     },
     {
         'id': 'is_private',
-        'name': '비회원에게 노출하는가',
+        'name': '외부 비공개',
         'hint': 'y or n',
         'type': Boolean,
         'default': False
