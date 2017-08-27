@@ -29,7 +29,7 @@ def nugu_edit(session, id, info):
 
     for k, v in info.items():
         if k in NUGU_FIELD_NAMES:
-            setattr(user, k, v.strip())
+            user.set_attr_by_string(k, v.strip())
 
     session.add(user)
     session.commit()

@@ -7,30 +7,149 @@ from sqlalchemy import create_engine
 
 from .settings import DB_URL
 
-
 NUGU_FIELDS = [
-    {'id': 'name', 'name': '이름', 'hint': '뀨냥이'},
-    {'id': 'is_developer', 'name': '개발자인가', 'hint': '0 or 1'},
-    {'id': 'is_designer', 'name': '디자이너인가', 'hint': '0 or 1'},
-    {'id': 'is_undergraduate', 'name': '학부생인가', 'hint': '0 or 1'},
-    {'id': 'ent_year', 'name': '학번', 'hint': '14'},
-    {'id': 'org', 'name': '소속'},
-    {'id': 'email', 'name': '이메일'},
-    {'id': 'phone', 'name': '전화번호', 'hint': '010-xxxx-xxxx'},
-    {'id': 'birth', 'name': '생일', 'hint': '1996-01-01'},
-    {'id': 'dorm', 'name': '기숙사'},
-    {'id': 'lab', 'name': '랩'},
-    {'id': 'home_add', 'name': '집주소'},
-    {'id': 'github_id', 'name': 'Github ID'},
-    {'id': 'linkedin_url', 'name': 'LinkedIn URL'},
-    {'id': 'behance_url', 'name': 'Behance URL'},
-    {'id': 'facebook_id', 'name': 'Facebook ID'},
-    {'id': 'twitter_id', 'name': 'Twitter ID'},
-    {'id': 'battlenet_id', 'name': 'Battlenet ID'},
-    {'id': 'website', 'name': '홈페이지'},
-    {'id': 'blog', 'name': '블로그'},
-    {'id': 'created_on', 'name': '생성일', 'readonly': True},
-    {'id': 'updated_on', 'name': '수정일', 'readonly': True},
+    {
+        'id': 'name',
+        'name': '이름',
+        'hint': '뀨냥이',
+        'type': String(255),
+        'nullable': True,
+    },
+    {
+        'id': 'is_developer',
+        'name': '개발자인가',
+        'hint': '0 or 1',
+        'type': Boolean,
+        'default': True
+    },
+    {
+        'id': 'is_designer',
+        'name': '디자이너인가',
+        'hint': '0 or 1',
+        'type': Boolean,
+        'default': False
+    },
+    {
+        'id': 'is_undergraduate',
+        'name': '학부생인가',
+        'hint': '0 or 1',
+        'type': Boolean,
+        'default': True
+    },
+    {
+        'id': 'ent_year',
+        'name': '학번',
+        'hint': '14',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'org',
+        'name': '소속',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'email',
+        'name': '이메일',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'phone',
+        'name': '전화번호',
+        'hint': '010-xxxx-xxxx',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'birth',
+        'name': '생일',
+        'hint': '1996-01-01',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'dorm',
+        'name': '기숙사',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'lab',
+        'name': '랩',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'home_add',
+        'name': '집주소',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'github_id',
+        'name': 'Github ID',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'linkedin_url',
+        'name': 'LinkedIn URL',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'behance_url',
+        'name': 'Behance URL',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'facebook_id',
+        'name': 'Facebook ID',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'twitter_id',
+        'name': 'Twitter ID',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'battlenet_id',
+        'name': 'Battlenet ID',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'website',
+        'name': '홈페이지',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'blog',
+        'name': '블로그',
+        'type': String(255),
+        'nullable': True
+    },
+    {
+        'id': 'created_on',
+        'name': '생성일',
+        'type': DateTime,
+        'readonly': True,
+        'default': datetime.utcnow
+    },
+    {
+        'id': 'updated_on',
+        'name': '수정일',
+        'type': DateTime,
+        'readonly': True,
+        'default': datetime.utcnow,
+        'onupdate': datetime.utcnow
+    },
 ]
 
 NUGU_FIELD_NAMES = [field['id'] for field in NUGU_FIELDS
@@ -43,28 +162,6 @@ class User(Base):
     __tablename__ = 'user'
 
     id = Column(String(30), primary_key=True)
-    name = Column(String(255), nullable=True)
-    is_developer = Column(Boolean, default=True)
-    is_designer = Column(Boolean, default=False)
-    is_undergraduate = Column(Boolean, default=True)
-    ent_year = Column(String(255), nullable=True)
-    org = Column(String(255), nullable=True)
-    email = Column(String(255), nullable=True)
-    phone = Column(String(255), nullable=True)
-    birth = Column(String(255), nullable=True)
-    dorm = Column(String(255), nullable=True)
-    lab = Column(String(255), nullable=True)
-    home_add = Column(String(255), nullable=True)
-    github_id = Column(String(255), nullable=True)
-    linkedin_url = Column(String(255), nullable=True)
-    behance_url = Column(String(255), nullable=True)
-    facebook_id = Column(String(255), nullable=True)
-    twitter_id = Column(String(255), nullable=True)
-    battlenet_id = Column(String(255), nullable=True)
-    website = Column(String(255), nullable=True)
-    blog = Column(String(255), nullable=True)
-    created_on = Column(DateTime, default=datetime.utcnow)
-    updated_on = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @staticmethod
     def _gen_json(value_func):
@@ -82,10 +179,40 @@ class User(Base):
         return User._gen_json(lambda i: i.get('hint', ''))
 
     def to_json(self):
-        return self._gen_json(lambda i: getattr(self, i['id']) or "")
+        return self._gen_json(lambda i: self.get_attr_as_string(i['id']) or "")
 
     def __str__(self):
         return u'%s (%s, %s)' % (self.id, self.name, self.ent_year)
+
+    def get_attr_as_string(self, field_id):
+        value = getattr(self, field_id)
+        column_type = next(x for x in NUGU_FIELDS if x['id'] == field_id)['type']
+        if column_type == Boolean:
+            return 'y' if value else 'n'
+
+        return value
+        # print(isinstance(column_type, String))
+
+    def set_attr_by_string(self, field_id, value):
+        column_type = next(x for x in NUGU_FIELDS if x['id'] == field_id)['type']
+
+        if column_type == Boolean:
+            if value in ['TRUE', 'True', 'true', 'T', 't', 'YES', 'Yes', 'yes', 'Y', 'y', '1']:
+                value = True
+            elif value in ['FALSE', 'False', 'false', 'F', 'f', 'NO', 'No', 'no', 'N', 'n', '0']:
+                value = False
+            else:
+                value = value != ""
+
+        setattr(self, field_id, value)
+
+
+for field in NUGU_FIELDS:
+    kwargs = {}
+    for kwarg in ['nullable', 'default', 'onupdate']:
+        if kwarg in field:
+            kwargs[kwarg] = field[kwarg]
+    setattr(User, field['id'], Column(field['type'], **kwargs))
 
 
 def create_session():

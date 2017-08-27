@@ -53,7 +53,7 @@ def do_get(session, target):
 
     print('=' * 60)
     for idx, i in enumerate(NUGU_FIELDS):
-        value = getattr(user, i['id'])
+        value = user.get_attr_as_string(i['id'])
         value = '' if value is None else value
         if type(value) == datetime:
             value = (value + timedelta(hours=9)).isoformat() + 'KST'
