@@ -62,6 +62,7 @@ killasgroup=true
 
 ## Developers
 
+- luan (이상국)
 - samjo (조성원)
 - netj (신재호)
 - daybreaker (김준기)

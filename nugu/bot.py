@@ -27,7 +27,7 @@ def _user_list(users):
 def _user_info(user):
     result = [SL_MSG_USER_HEADER % user.id, ]
     for i in NUGU_FIELDS:
-        value = getattr(user, i['id'])
+        value = user.get_attr_as_string(i['id'])
         if not value:
             continue
         if type(value) == datetime:
