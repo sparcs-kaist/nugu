@@ -66,3 +66,7 @@ killasgroup=true
 - samjo (조성원)
 - netj (신재호)
 - daybreaker (김준기)
+
+## See Also
+
+[API Server](https://github.com/sparcs-kaist/nugu-api)
