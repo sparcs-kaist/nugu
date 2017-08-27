@@ -16,23 +16,30 @@ NUGU_FIELDS = [
         'nullable': True,
     },
     {
+        'id': 'is_private',
+        'name': '비회원에게 노출하는가',
+        'hint': 'y or n',
+        'type': Boolean,
+        'default': False
+    },
+    {
         'id': 'is_developer',
         'name': '개발자인가',
-        'hint': '0 or 1',
+        'hint': 'y or n',
         'type': Boolean,
-        'default': True
+        'default': False
     },
     {
         'id': 'is_designer',
         'name': '디자이너인가',
-        'hint': '0 or 1',
+        'hint': 'y or n',
         'type': Boolean,
         'default': False
     },
     {
         'id': 'is_undergraduate',
         'name': '학부생인가',
-        'hint': '0 or 1',
+        'hint': 'y or n',
         'type': Boolean,
         'default': True
     },
