@@ -141,8 +141,18 @@ def handle_chat(message):
         slack.chat.post_message(channel=channel, text=resp, as_user=True)
 
 
-async def bot(endpoint):
+async def bot(rtm):
     while True:
+        try:
+            response = rtm.start()
+            endpoint = response.body.get('url', '')
+            if not endpoint:
+                print('nugu.bot: cannot get Slack API endpoint; server sent={!r}'.format(response), file=sys.stderr)
+                exit(1)
+        except slacker.Error as e:
+            print('nugu.bot: Slack API error ({})'.format(e))
+            exit(1)
+
         try:
             async with websockets.connect(endpoint) as ws:
                 while True:
@@ -165,15 +175,6 @@ def main():
         exit(1)
 
     slack = slacker.Slacker(SLACK_TOKEN)
-    try:
-        response = slack.rtm.start()
-        endpoint = response.body.get('url', '')
-        if not endpoint:
-            print('nugu.bot: cannot get Slack API endpoint; server sent={!r}'.format(response), file=sys.stderr)
-            exit(1)
-    except slacker.Error as e:
-        print('nugu.bot: Slack API error ({})'.format(e))
-        exit(1)
 
     def handle_interrupt(loop, term_event):
         if term_event.is_set():
@@ -189,7 +190,7 @@ def main():
     loop.add_signal_handler(signal.SIGTERM, handle_interrupt, loop, term_event)
     try:
         print('nugu.bot: running...')
-        bot_task = loop.create_task(bot(endpoint))
+        bot_task = loop.create_task(bot(slack.rtm))
         loop.run_forever()
         # if interrupted...
         bot_task.cancel()
