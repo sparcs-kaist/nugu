@@ -119,7 +119,6 @@ def _get_id(slack, user_id):
 
 
 def handle_chat(slack, message):
-    resp = ''
     if message.get('type', '') != 'message' or \
             ('user' not in message or 'text' not in message):
         return
