@@ -62,10 +62,10 @@ killasgroup=true
 
 ## Developers
 
-- luan (이상국)
-- samjo (조성원)
-- netj (신재호)
-- daybreaker (김준기)
+- [luan](https://github.com/sangguk2) (이상국)
+- [samjo](https://github.com/samjo-nyang) (조성원)
+- [netj](https://github.com/netj) (신재호)
+- [daybreaker](https://github.com/achimnol) (김준기)
 
 ## See Also
 
