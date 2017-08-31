@@ -170,15 +170,16 @@ async def bot(rtm):
             break
 
         except ConnectionClosed as e:
+            log.exception('Websocket connection is closed. ' + str(e))
+
             if (e.code == 1006) and (not e.reason):
-                log.exception(str(e))
-                print('restarting rtm...', file=sys.stderr)
+                print('Restarting RTM...', file=sys.stderr)
                 endpoint = await start_rtm(rtm)
 
-        except :
-            log.exception('unexpected error')
-            print('reconnecting websocket...', file=sys.stderr)
-            continue
+        except Exception as e:
+            log.exception('Unexpected error Occurred. ' + str(e))
+
+        print('Reconnecting websocket...', file=sys.stderr)
 
 
 def main():
