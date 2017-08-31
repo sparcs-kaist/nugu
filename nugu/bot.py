@@ -14,10 +14,7 @@ from .core import nugu_get, nugu_search, nugu_edit, nugu_battlenet
 from .models import create_session, NUGU_FIELDS, NUGU_FIELD_NAMES
 from .msg import *
 
-
 log = logging.getLogger(__name__)
-
-slack = None
 
 
 def _user_list(users):
@@ -112,8 +109,8 @@ def _nugu(session, text, email):
         return SL_MSG_ERROR % str(e)
 
 
-def _get_id(userid):
-    result = slack.users.info(userid).body
+def _get_id(slack, user_id):
+    result = slack.users.info(user_id).body
     email = result['user']['profile'].get('email', '')
     email_part = email.split('@')
     if len(email_part) != 2 or email_part[1] != 'sparcs.org':
@@ -121,7 +118,7 @@ def _get_id(userid):
     return email_part[0]
 
 
-def handle_chat(message):
+def handle_chat(slack, message):
     resp = ''
     if message.get('type', '') != 'message' or \
             ('user' not in message or 'text' not in message):
@@ -131,7 +128,7 @@ def handle_chat(message):
     if not text.startswith('!누구') and not text.startswith('!nugu'):
         return
 
-    id = _get_id(message['user'])
+    id = _get_id(slack, message['user'])
     if not id:
         return
 
@@ -142,9 +139,9 @@ def handle_chat(message):
         slack.chat.post_message(channel=channel, text=resp, as_user=True)
 
 
-async def start_rtm(rtm):
+async def start_rtm(slack):
     try:
-        response = rtm.start()
+        response = slack.rtm.start()
         endpoint = response.body.get('url', '')
         if not endpoint:
             print('nugu.bot: cannot get Slack API endpoint; server sent={!r}'.format(response), file=sys.stderr)
@@ -156,8 +153,8 @@ async def start_rtm(rtm):
         exit(1)
 
 
-async def bot(rtm):
-    endpoint = await start_rtm(rtm)
+async def bot(slack):
+    endpoint = await start_rtm(slack)
 
     while True:
         try:
@@ -165,7 +162,7 @@ async def bot(rtm):
                 while True:
                     message = await ws.recv()
                     message = json.loads(message)
-                    handle_chat(message)
+                    handle_chat(slack, message)
         except asyncio.CancelledError:
             break
 
@@ -174,7 +171,7 @@ async def bot(rtm):
 
             if (e.code == 1006) and (not e.reason):
                 print('Restarting RTM...', file=sys.stderr)
-                endpoint = await start_rtm(rtm)
+                endpoint = await start_rtm(slack)
 
         except Exception as e:
             log.exception('Unexpected error Occurred. ' + str(e))
@@ -183,13 +180,9 @@ async def bot(rtm):
 
 
 def main():
-    global slack
-
     if SLACK_TOKEN is None:
         print('nugu.bot: Please set NUGU_SLACK_TOKEN environment variable.', file=sys.stderr)
         exit(1)
-
-    slack = slacker.Slacker(SLACK_TOKEN)
 
     def handle_interrupt(loop, term_event):
         if term_event.is_set():
@@ -205,7 +198,7 @@ def main():
     loop.add_signal_handler(signal.SIGTERM, handle_interrupt, loop, term_event)
     try:
         print('nugu.bot: running...')
-        bot_task = loop.create_task(bot(slack.rtm))
+        bot_task = loop.create_task(bot(slacker.Slacker(SLACK_TOKEN)))
         loop.run_forever()
         # if interrupted...
         bot_task.cancel()
