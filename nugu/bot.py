@@ -7,6 +7,7 @@ import sys
 
 import slacker
 import websockets
+from websockets.exceptions import ConnectionClosed
 
 from .settings import SLACK_TOKEN
 from .core import nugu_get, nugu_search, nugu_edit, nugu_battlenet
@@ -141,18 +142,24 @@ def handle_chat(message):
         slack.chat.post_message(channel=channel, text=resp, as_user=True)
 
 
-async def bot(rtm):
-    while True:
-        try:
-            response = rtm.start()
-            endpoint = response.body.get('url', '')
-            if not endpoint:
-                print('nugu.bot: cannot get Slack API endpoint; server sent={!r}'.format(response), file=sys.stderr)
-                exit(1)
-        except slacker.Error as e:
-            print('nugu.bot: Slack API error ({})'.format(e))
+async def start_rtm(rtm):
+    try:
+        response = rtm.start()
+        endpoint = response.body.get('url', '')
+        if not endpoint:
+            print('nugu.bot: cannot get Slack API endpoint; server sent={!r}'.format(response), file=sys.stderr)
             exit(1)
+        else:
+            return endpoint
+    except slacker.Error as e:
+        print('nugu.bot: Slack API error ({})'.format(e))
+        exit(1)
 
+
+async def bot(rtm):
+    endpoint = await start_rtm(rtm)
+
+    while True:
         try:
             async with websockets.connect(endpoint) as ws:
                 while True:
@@ -161,9 +168,16 @@ async def bot(rtm):
                     handle_chat(message)
         except asyncio.CancelledError:
             break
-        except:
+
+        except ConnectionClosed as e:
+            if (e.code == 1006) and (not e.reason):
+                log.exception(str(e))
+                print('restarting rtm...', file=sys.stderr)
+                endpoint = await start_rtm(rtm)
+
+        except :
             log.exception('unexpected error')
-            print('reconnecting...', file=sys.stderr)
+            print('reconnecting websocket...', file=sys.stderr)
             continue
 
 
