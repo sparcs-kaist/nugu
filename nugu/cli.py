@@ -13,8 +13,10 @@ from .core import nugu_list, nugu_get, nugu_search, nugu_edit, nugu_remove
 from .models import create_session, User, NUGU_FIELDS
 
 
-def _pad(s, p, r=True):
+def _pad(s, p=0, r=True):
     s = '' if s is None else s
+    if p == 0:
+        return s
     l = 0
     for c in s:
         w = unicodedata.east_asian_width(c)
@@ -28,7 +30,7 @@ def _print_list(users):
     def fmt(ent_year, name, id, github_id, phone, org):
         return '{:s}{:s}{:s}{:s}{:s}{:s}'.format(
             _pad(ent_year, 6), _pad(name, 12), _pad(id, 16),
-            _pad(github_id, 16), _pad(phone, 20), org)
+            _pad(github_id, 16), _pad(phone, 20), _pad(org))
     print('=' * 80)
     print(fmt('학번', '이름', '아이디', 'Github ID', '휴대폰', '소속'))
     print('-' * 80)
