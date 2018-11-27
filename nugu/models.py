@@ -46,7 +46,7 @@ NUGU_FIELDS = [
     {
         'id': 'ent_year',
         'name': '학번',
-        'hint': '14',
+        'hint': '2018',
         'type': String(255),
         'nullable': True
     },
