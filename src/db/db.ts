@@ -6,6 +6,11 @@ export const db = drizzle({
   casing: 'snake_case',
 })
 
-export type Database = typeof db
-export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+type Database = typeof db
+type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 export type QueryClient = Database | Transaction
+
+type TransactionFunction<T> = (client: QueryClient) => T
+export const transaction = <T>(
+  inner: TransactionFunction<Promise<T>>,
+): Promise<T> => db.transaction(inner)
