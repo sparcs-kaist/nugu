@@ -4,6 +4,7 @@ import { HTTPException } from 'hono/http-exception'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 import { env } from '@/env'
+import * as authService from '@/modules/auth/authService'
 import { google } from '@/modules/auth/google'
 
 // TODO: Use key-value store for distributed system (e.g., Redis)
@@ -38,10 +39,10 @@ const app = new Hono()
       states.delete(state)
 
       const { access_token } = await google.issueToken(code)
-      const user = await google.getUserInfo(access_token)
+      const googleInfo = await google.getUserInfo(access_token)
 
-      // TODO: Save to database if user does not exist
-      console.log(user)
+      const userId = await authService.getOrRegisterUserByGoogle(googleInfo)
+      console.log(userId)
 
       // TODO: Issue JWT token
 

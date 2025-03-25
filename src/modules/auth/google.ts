@@ -33,7 +33,7 @@ const issueToken = async (code: string): Promise<GoogleIssuedToken> =>
     })
     .json()
 
-type GoogleUserInfo = {
+export type GoogleUserInfo = {
   sub: string
   name: string
   given_name: string
