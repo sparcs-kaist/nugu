@@ -6,6 +6,8 @@ export const env = z
     AUTH_GOOGLE_CLIENT_ID: z.string(),
     AUTH_GOOGLE_CLIENT_SECRET: z.string(),
     AUTH_GOOGLE_REDIRECT_URI: z.string().url(),
+    JWT_SECRET: z.string(),
+    COOKIE_SECRET: z.string(),
     CORS_ORIGIN: z.string().url(),
     DEFAULT_REDIRECT_URL: z.string().url(),
   })
