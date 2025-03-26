@@ -1,7 +1,9 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import { HTTPException } from 'hono/http-exception'
 import { P, match } from 'ts-pattern'
+import { env } from '@/env'
 import authRoute from '@/modules/auth/authRoute'
 import { UserNotFoundException } from '@/modules/user/userExceptions'
 import userRoute from '@/modules/user/userRoute'
@@ -9,6 +11,12 @@ import userRoute from '@/modules/user/userRoute'
 const app = new Hono({ strict: false })
 
 app
+  .use(
+    cors({
+      origin: env.CORS_ORIGIN,
+      credentials: true,
+    }),
+  )
   .route('/auth', authRoute)
   .route('/users', userRoute)
   .onError((err, c) =>
