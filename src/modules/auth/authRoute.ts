@@ -4,6 +4,7 @@ import { HTTPException } from 'hono/http-exception'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 import { env } from '@/env'
+import { setAuthToken, signAuthToken } from '@/modules/auth/authGuard'
 import * as authService from '@/modules/auth/authService'
 import { google } from '@/modules/auth/google'
 
@@ -42,9 +43,9 @@ const app = new Hono()
       const googleInfo = await google.getUserInfo(access_token)
 
       const userId = await authService.getOrRegisterUserByGoogle(googleInfo)
-      console.log(userId)
 
-      // TODO: Issue JWT token
+      const authToken = await signAuthToken({ sub: userId })
+      await setAuthToken(c, authToken)
 
       return c.redirect(redirectURL)
     },
