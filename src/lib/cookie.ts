@@ -17,8 +17,8 @@ type CookieKey = keyof Cookie
 const defaultSetOptions = {
   httpOnly: true,
   secure: true,
-  sameSite: 'strict',
-  prefix: 'secure',
+  sameSite: 'none',
+  prefix: 'host',
 } as const satisfies CookieOptions
 type SetCookieOptions = Omit<CookieOptions, keyof typeof defaultSetOptions>
 
@@ -26,7 +26,7 @@ const getCookie = async <TKey extends CookieKey>(
   c: Context,
   key: TKey,
 ): Promise<{ ok: true; data: Cookie[TKey] | undefined } | { ok: false }> => {
-  const value = await getSignedCookie(c, env.COOKIE_SECRET, key, 'secure')
+  const value = await getSignedCookie(c, env.COOKIE_SECRET, key, 'host')
 
   if (value === false) return { ok: false }
   if (value === undefined) return { ok: true, data: undefined }
@@ -45,7 +45,7 @@ const setCookie = <TKey extends CookieKey>(
   })
 
 const deleteCookie = <TKey extends CookieKey>(c: Context, key: TKey): void => {
-  _deleteCookie(c, key, { prefix: 'secure' })
+  _deleteCookie(c, key, { prefix: 'host' })
 }
 
 export const cookie = {
