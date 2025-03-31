@@ -1,11 +1,15 @@
 import { and, eq } from 'drizzle-orm'
 import { type QueryClient, db } from '@/db/db'
-import { type AccountInsert, authAccounts } from '@/db/schema/auth-acount'
+import {
+  type AccountInsert,
+  type AuthProvider,
+  authAccounts,
+} from '@/db/schema/auth-acount'
 import { users } from '@/db/schema/user'
 
 export const findUserByAccount = async (
   data: {
-    provider: string
+    provider: AuthProvider
     providerAccountId: string
   },
   client: QueryClient = db,

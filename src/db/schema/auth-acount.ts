@@ -5,10 +5,12 @@ import {
   primaryKey,
   varchar,
 } from 'drizzle-orm/mysql-core'
-import { createInsertSchema } from 'drizzle-zod'
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import { timestamps } from '@/db/fields'
 import { users } from '@/db/schema/user'
+
+const authProviders = ['GOOGLE'] as const
 
 export const authAccounts = mysqlTable(
   'auth_account',
@@ -16,7 +18,7 @@ export const authAccounts = mysqlTable(
     userId: int()
       .notNull()
       .references(() => users.id),
-    provider: varchar({ length: 20 }).notNull(),
+    provider: varchar({ length: 20, enum: authProviders }).notNull(),
     providerAccountId: varchar({ length: 255 }).notNull(),
     name: varchar({ length: 50 }).notNull(),
     email: varchar({ length: 255 }).notNull(),
@@ -30,6 +32,10 @@ export const authAccounts = mysqlTable(
   ],
 )
 
+const accountSchema = createSelectSchema(authAccounts)
 const accountInsertSchema = createInsertSchema(authAccounts)
 
+type Account = z.infer<typeof accountSchema>
 export type AccountInsert = z.infer<typeof accountInsertSchema>
+
+export type AuthProvider = Account['provider']

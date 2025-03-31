@@ -4,15 +4,11 @@ import { createAccount, findUserByAccount } from '@/modules/auth/authRepo'
 import { type GoogleUserInfo } from '@/modules/auth/google'
 import { registerUser } from '@/modules/user/userService'
 
-const providers = {
-  google: 'GOOGLE',
-} as const
-
 const findUserByGoogleAccount = (
   googleAccountId: string,
 ): Promise<User | null> =>
   findUserByAccount({
-    provider: providers.google,
+    provider: 'GOOGLE',
     providerAccountId: googleAccountId,
   })
 
@@ -31,7 +27,7 @@ const registerUserAndCreateGoogleAccount = async (
       {
         name: googleInfo.name,
         userId,
-        provider: providers.google,
+        provider: 'GOOGLE',
         providerAccountId: googleInfo.sub,
         email: googleInfo.email,
         avatarURL: googleInfo.picture,
