@@ -32,6 +32,6 @@ export const findUserByAccount = async (
 export const createAccount = async (
   account: AccountInsert,
   client: QueryClient = db,
-): Promise<void> => {
+) => {
   await client.insert(authAccounts).values(account)
 }

@@ -1,7 +1,7 @@
 import ky from 'ky'
 import { env } from '@/env'
 
-const getRedirectURL = (state: string): string => {
+const getRedirectURL = (state: string) => {
   const searchParams = new URLSearchParams({
     client_id: env.AUTH_GOOGLE_CLIENT_ID,
     redirect_uri: env.AUTH_GOOGLE_REDIRECT_URI,
@@ -20,7 +20,7 @@ type GoogleIssuedToken = {
   id_token: string
 }
 
-const issueToken = async (code: string): Promise<GoogleIssuedToken> =>
+const issueToken = async (code: string) =>
   ky
     .post<GoogleIssuedToken>(`https://oauth2.googleapis.com/token`, {
       searchParams: {
@@ -43,7 +43,7 @@ export type GoogleUserInfo = {
   email_verified: boolean
 }
 
-const getUserInfo = (accessToken: string): Promise<GoogleUserInfo> =>
+const getUserInfo = (accessToken: string) =>
   ky
     .get<GoogleUserInfo>('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: {

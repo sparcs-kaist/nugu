@@ -38,13 +38,13 @@ const setCookie = <TKey extends CookieKey>(
   key: TKey,
   value: Cookie[TKey],
   options?: SetCookieOptions,
-): Promise<void> =>
+) =>
   setSignedCookie(c, key, JSON.stringify(value), env.COOKIE_SECRET, {
     ...defaultSetOptions,
     ...options,
   })
 
-const deleteCookie = <TKey extends CookieKey>(c: Context, key: TKey): void => {
+const deleteCookie = <TKey extends CookieKey>(c: Context, key: TKey) => {
   _deleteCookie(c, key, { prefix: 'host' })
 }
 

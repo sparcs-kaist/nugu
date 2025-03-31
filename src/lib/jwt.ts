@@ -13,9 +13,8 @@ const tokenSchema = z.object({
 type Token = z.infer<typeof tokenSchema>
 type TokenKey = keyof Token
 
-const signToken = <TKey extends TokenKey>(
-  payload: Token[TKey],
-): Promise<string> => sign(payload, env.JWT_SECRET, JWT_ALGORITHM)
+const signToken = <TKey extends TokenKey>(payload: Token[TKey]) =>
+  sign(payload, env.JWT_SECRET, JWT_ALGORITHM)
 
 const verifyToken = async <TKey extends TokenKey>(
   key: TKey,

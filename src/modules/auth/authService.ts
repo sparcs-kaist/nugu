@@ -1,20 +1,15 @@
 import { transaction } from '@/db'
-import type { User } from '@/db/schema/user'
 import { createAccount, findUserByAccount } from '@/modules/auth/authRepo'
 import { type GoogleUserInfo } from '@/modules/auth/google'
 import { registerUser } from '@/modules/user/userService'
 
-const findUserByGoogleAccount = (
-  googleAccountId: string,
-): Promise<User | null> =>
+const findUserByGoogleAccount = (googleAccountId: string) =>
   findUserByAccount({
     provider: 'GOOGLE',
     providerAccountId: googleAccountId,
   })
 
-const registerUserAndCreateGoogleAccount = async (
-  googleInfo: GoogleUserInfo,
-): Promise<number> =>
+const registerUserAndCreateGoogleAccount = async (googleInfo: GoogleUserInfo) =>
   transaction(async (client) => {
     const userId = await registerUser(
       {

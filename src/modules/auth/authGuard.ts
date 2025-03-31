@@ -24,10 +24,10 @@ export const authGuard = createMiddleware<{ Variables: TVariables }>(
 
 type AuthTokenPayload = { sub: number }
 
-export const signAuthToken = (payload: AuthTokenPayload): Promise<string> => {
+export const signAuthToken = (payload: AuthTokenPayload) => {
   const iat = getUnixTimeInSeconds()
   return jwt.sign<'authToken'>({ iat, ...payload })
 }
 
-export const setAuthToken = (c: Context, token: string): Promise<void> =>
+export const setAuthToken = (c: Context, token: string) =>
   cookie.set(c, 'authToken', token, { maxAge: 3600 })
