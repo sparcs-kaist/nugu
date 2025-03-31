@@ -1,4 +1,4 @@
-import { transaction } from '@/db/db'
+import { transaction } from '@/db'
 import type { User } from '@/db/schema/user'
 import { createAccount, findUserByAccount } from '@/modules/auth/authRepo'
 import { type GoogleUserInfo } from '@/modules/auth/google'

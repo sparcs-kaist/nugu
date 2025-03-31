@@ -23,7 +23,10 @@ app
     match(err)
       .with(P.instanceOf(HTTPException), (e) => e.getResponse())
       .with(P.instanceOf(UserNotFoundException), (e) => c.text(e.message, 404))
-      .otherwise(() => c.text('Internal Server Error', 500)),
+      .otherwise(() => {
+        console.error(err)
+        return c.text('Internal Server Error', 500)
+      }),
   )
 
 serve({

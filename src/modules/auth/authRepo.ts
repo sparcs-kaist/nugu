@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm'
-import { type QueryClient, db } from '@/db/db'
+import { type QueryClient, db } from '@/db'
 import {
   type AccountInsert,
   type AuthProvider,
