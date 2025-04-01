@@ -1,10 +1,17 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { userInsertSchema } from '@/db/schema/user'
+import { authGuard } from '@/modules/auth/authGuard'
 import * as userService from '@/modules/user/userService'
 
 const app = new Hono()
+  .get('/me', authGuard, async (c) => {
+    const userId = c.get('userId')
+
+    const user = await userService.getUser(userId)
+
+    return c.json(user)
+  })
   .get(
     '/:id',
     zValidator('param', z.object({ id: z.coerce.number() })),
@@ -16,13 +23,5 @@ const app = new Hono()
       return c.json(user)
     },
   )
-  .post('/', zValidator('json', userInsertSchema), async (c) => {
-    const userData = c.req.valid('json')
-
-    const id = await userService.registerUser(userData)
-    const user = await userService.getUser(id)
-
-    return c.json(user, 201)
-  })
 
 export default app
