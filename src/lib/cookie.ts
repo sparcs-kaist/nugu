@@ -18,7 +18,7 @@ const cookieOptions = {
   httpOnly: true,
   secure: true,
   sameSite: 'none',
-  prefix: env.MODE === 'production' ? 'host' : undefined,
+  prefix: env.NODE_ENV === 'production' ? 'host' : undefined,
 } as const satisfies CookieOptions
 type SetCookieOptions = Omit<CookieOptions, keyof typeof cookieOptions>
 
