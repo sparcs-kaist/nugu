@@ -14,19 +14,21 @@ const cookieSchema = z.object({
 type Cookie = z.infer<typeof cookieSchema>
 type CookieKey = keyof Cookie
 
-const defaultSetOptions = {
+const cookieOptions = {
   httpOnly: true,
   secure: true,
   sameSite: 'none',
-  prefix: 'host',
+  prefix: env.NODE_ENV === 'production' ? 'host' : undefined,
 } as const satisfies CookieOptions
-type SetCookieOptions = Omit<CookieOptions, keyof typeof defaultSetOptions>
+type SetCookieOptions = Omit<CookieOptions, keyof typeof cookieOptions>
 
 const getCookie = async <TKey extends CookieKey>(
   c: Context,
   key: TKey,
 ): Promise<{ ok: true; data: Cookie[TKey] | undefined } | { ok: false }> => {
-  const value = await getSignedCookie(c, env.COOKIE_SECRET, key, 'host')
+  const value = await (cookieOptions.prefix === undefined
+    ? getSignedCookie(c, env.COOKIE_SECRET, key)
+    : getSignedCookie(c, env.COOKIE_SECRET, key, cookieOptions.prefix))
 
   if (value === false) return { ok: false }
   if (value === undefined) return { ok: true, data: undefined }
@@ -40,12 +42,12 @@ const setCookie = <TKey extends CookieKey>(
   options?: SetCookieOptions,
 ) =>
   setSignedCookie(c, key, JSON.stringify(value), env.COOKIE_SECRET, {
-    ...defaultSetOptions,
+    ...cookieOptions,
     ...options,
   })
 
 const deleteCookie = <TKey extends CookieKey>(c: Context, key: TKey) => {
-  _deleteCookie(c, key, { prefix: 'host' })
+  _deleteCookie(c, key, { prefix: cookieOptions.prefix })
 }
 
 export const cookie = {
