@@ -4,7 +4,11 @@ import { HTTPException } from 'hono/http-exception'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 import { env } from '@/env'
-import { setAuthToken, signAuthToken } from '@/modules/auth/authGuard'
+import {
+  removeAuthToken,
+  setAuthToken,
+  signAuthToken,
+} from '@/modules/auth/authGuard'
 import * as authService from '@/modules/auth/authService'
 import { google } from '@/modules/auth/google'
 
@@ -15,6 +19,10 @@ import { google } from '@/modules/auth/google'
 const states = new Map<string, string>()
 
 const app = new Hono()
+  .get('/signout', (c) => {
+    removeAuthToken(c)
+    return c.redirect(env.DEFAULT_REDIRECT_URL)
+  })
   .get('/google', (c) => {
     const from = c.req.query('from')
     const state = uuidv4()
