@@ -18,3 +18,10 @@ export const registerUser = (
   },
   client: QueryClient,
 ) => userRepo.createUser(user, client)
+
+export const searchSparcsUser = async (keyword: string) => {
+  const user = await userRepo.searchSparcsUser(keyword)
+  if (user === null)
+    throw new UserNotFoundException(`User with nickname ${keyword} not found`)
+  return user
+}

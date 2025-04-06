@@ -13,6 +13,17 @@ const app = new Hono()
     return c.json(user)
   })
   .get(
+    '/sparcs',
+    zValidator('query', z.object({ q: z.string() })),
+    async (c) => {
+      const { q } = c.req.valid('query')
+
+      const user = await userService.searchSparcsUser(q)
+
+      return c.json(user)
+    },
+  )
+  .get(
     '/:id',
     zValidator('param', z.object({ id: z.coerce.number() })),
     async (c) => {
