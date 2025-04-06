@@ -14,11 +14,24 @@ const app = new Hono()
   })
   .get(
     '/sparcs',
-    zValidator('query', z.object({ q: z.string() })),
+    zValidator(
+      'query',
+      z.object({
+        q: z.string(),
+        page: z
+          .string()
+          .transform((val) => parseInt(val))
+          .pipe(z.number().min(0)),
+        size: z
+          .string()
+          .transform((val) => parseInt(val))
+          .pipe(z.number().min(1)),
+      }),
+    ),
     async (c) => {
-      const { q } = c.req.valid('query')
+      const { q, page, size } = c.req.valid('query')
 
-      const user = await userService.searchSparcsUser(q)
+      const user = await userService.searchSparcsUser(q, page, size)
 
       return c.json(user)
     },

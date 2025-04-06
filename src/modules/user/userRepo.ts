@@ -2,6 +2,13 @@ import { eq, like, or, sql } from 'drizzle-orm'
 import { type QueryClient, db } from '@/db'
 import { type UserInsert, users } from '@/db/schema/user'
 import { sparcsUsers } from '@/db/schema/user-sparcs'
+import type { Paginated } from '@/lib/pagination'
+
+type SearchedSparcsUser = {
+  id: number
+  nickname: string
+  fullName: string
+}
 
 export const findUser = async (id: number, client: QueryClient = db) => {
   const [user] = await client.select().from(users).where(eq(users.id, id))
@@ -18,9 +25,11 @@ export const createUser = async (
 
 export const searchSparcsUser = async (
   keyword: string,
+  page: number,
+  size: number,
   client: QueryClient = db,
-) =>
-  await client
+): Promise<Paginated<SearchedSparcsUser>> => {
+  const data = await client
     .select({
       id: users.id,
       nickname: sparcsUsers.nickname,
@@ -40,3 +49,16 @@ export const searchSparcsUser = async (
         ),
       ),
     )
+    .limit(size)
+    .offset(page * size)
+
+  return {
+    data,
+    pageInfo: {
+      page,
+      size,
+      totalElements: data.length,
+      totalPages: Math.ceil(data.length / size),
+    },
+  }
+}
