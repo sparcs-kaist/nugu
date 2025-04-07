@@ -18,14 +18,8 @@ const app = new Hono()
       'query',
       z.object({
         q: z.string(),
-        page: z
-          .string()
-          .transform((val) => parseInt(val))
-          .pipe(z.number().min(0)),
-        size: z
-          .string()
-          .transform((val) => parseInt(val))
-          .pipe(z.number().min(1)),
+        page: z.coerce.number(),
+        size: z.coerce.number(),
       }),
     ),
     async (c) => {
