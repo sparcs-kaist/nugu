@@ -29,5 +29,10 @@ export const signAuthToken = (payload: AuthTokenPayload) => {
   return jwt.sign<'authToken'>({ iat, ...payload })
 }
 
-export const setAuthToken = (c: Context, token: string) =>
-  cookie.set(c, 'authToken', token, { maxAge: 3600 })
+export const setAuthToken = async (c: Context, token: string) => {
+  await cookie.set(c, 'authToken', token, { maxAge: 3600 })
+}
+
+export const removeAuthToken = (c: Context) => {
+  cookie.delete(c, 'authToken')
+}
