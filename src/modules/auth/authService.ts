@@ -57,6 +57,7 @@ export const getOrRegisterUserByGoogle = async (googleInfo: GoogleUserInfo) => {
   if (existingEmail) {
     const userId = existingEmail.userId
     await createGoogleAccount(userId, googleInfo)
+    // TODO: Set email verified if not
     return userId
   }
 

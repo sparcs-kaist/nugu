@@ -1,5 +1,5 @@
 import { match } from 'ts-pattern'
-import { type QueryClient, db } from '@/db'
+import { type QueryClient, db, transaction } from '@/db'
 import { type Result, result } from '@/lib/result'
 import * as emailRepo from '@/modules/user/emailRepo'
 
@@ -39,4 +39,33 @@ export const addEmail = async (
         throw error
       })
   }
+}
+
+type SetPrimaryEmailResult = Result<
+  null,
+  { message: string; code: 'EMAIL_NOT_FOUND' | 'EMAIL_NOT_VERIFIED' }
+>
+
+export const setPrimaryEmail = async (
+  userId: number,
+  emailId: number,
+): Promise<SetPrimaryEmailResult> => {
+  const email = await emailRepo.findEmailById(emailId)
+
+  if (!email)
+    return result.err({ message: 'Email not found', code: 'EMAIL_NOT_FOUND' })
+
+  if (!email.verified)
+    return result.err({
+      message: 'Email must be verified before setting as primary',
+      code: 'EMAIL_NOT_VERIFIED',
+    })
+
+  if (!email.primary)
+    await transaction(async (client) => {
+      await emailRepo.unsetPrimaryEmail(userId, client)
+      await emailRepo.setPrimaryEmail(emailId, client)
+    })
+
+  return result.ok(null)
 }
