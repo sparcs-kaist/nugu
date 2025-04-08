@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { match } from 'ts-pattern'
 import { z } from 'zod'
+import { response } from '@/lib/response'
 import { authGuard } from '@/modules/auth/authGuard'
 import * as emailService from '@/modules/user/emailService'
 import { setPrimaryEmail } from '@/modules/user/emailService'
@@ -70,8 +71,7 @@ const app = new Hono()
         })
 
       const res = await setPrimaryEmail(userId, emailId)
-      // TODO: Add HTTPResponse function (E.g., HttpResponse.NoContent(c))
-      if (res.ok) return c.body(null, 204)
+      if (res.ok) return response.noContent(c)
 
       return match(res.error)
         .with({ code: 'EMAIL_NOT_FOUND' }, ({ message }) => {
