@@ -1,7 +1,11 @@
 import { type QueryClient, db, transaction } from '@/db'
 import { createAccount, findUserByAccount } from '@/modules/auth/authRepo'
 import { type GoogleUserInfo } from '@/modules/auth/google'
-import { addEmail, findEmail } from '@/modules/user/emailService'
+import {
+  addEmail,
+  findEmail,
+  setEmailVerified,
+} from '@/modules/user/emailService'
 import { registerUser } from '@/modules/user/userService'
 
 const findUserByGoogleAccount = (googleAccountId: string) =>
@@ -56,8 +60,14 @@ export const getOrRegisterUserByGoogle = async (googleInfo: GoogleUserInfo) => {
   const existingEmail = await findEmail(googleInfo.email)
   if (existingEmail) {
     const userId = existingEmail.userId
-    await createGoogleAccount(userId, googleInfo)
-    // TODO: Set email verified if not
+    if (existingEmail.verified) {
+      await createGoogleAccount(userId, googleInfo)
+    } else {
+      await transaction(async (client) => {
+        await createGoogleAccount(userId, googleInfo, client)
+        await setEmailVerified(existingEmail.id, client)
+      })
+    }
     return userId
   }
 

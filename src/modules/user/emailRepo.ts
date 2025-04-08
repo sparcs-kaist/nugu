@@ -23,6 +23,16 @@ export const createEmail = async (
   return data!.id
 }
 
+export const setEmailVerified = async (
+  emailId: number,
+  client: QueryClient = db,
+) => {
+  await client
+    .update(emails)
+    .set({ verified: true })
+    .where(eq(emails.id, emailId))
+}
+
 export const setPrimaryEmail = async (
   emailId: number,
   client: QueryClient = db,

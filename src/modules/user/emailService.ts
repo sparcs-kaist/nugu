@@ -41,6 +41,9 @@ export const addEmail = async (
   }
 }
 
+export const setEmailVerified = (emailId: number, client: QueryClient) =>
+  emailRepo.setEmailVerified(emailId, client)
+
 type SetPrimaryEmailResult = Result<
   null,
   { message: string; code: 'EMAIL_NOT_FOUND' | 'EMAIL_NOT_VERIFIED' }
