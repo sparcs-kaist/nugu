@@ -1,4 +1,4 @@
-import { eq, like, or, sql } from 'drizzle-orm'
+import { count, eq, like, or, sql } from 'drizzle-orm'
 import { type QueryClient, db } from '@/db'
 import { type UserInsert, users } from '@/db/schema/user'
 import { sparcsUsers } from '@/db/schema/user-sparcs'
@@ -29,6 +29,11 @@ export const searchSparcsUser = async (
     fullName: string
   }>
 > => {
+  const totalData = await client
+    .select({ count: count() })
+    .from(users)
+    .innerJoin(sparcsUsers, eq(users.id, sparcsUsers.userId))
+
   const data = await client
     .select({
       id: users.id,
@@ -57,8 +62,8 @@ export const searchSparcsUser = async (
     pageInfo: {
       page,
       size,
-      totalElements: data.length,
-      totalPages: Math.ceil(data.length / size),
+      totalElements: totalData.length,
+      totalPages: Math.ceil(totalData.length / size),
     },
   }
 }
