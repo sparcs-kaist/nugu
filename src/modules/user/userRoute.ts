@@ -19,12 +19,12 @@ const app = new Hono()
       'query',
       z.object({
         q: z.string(),
-        page: z.coerce.number().optional(),
-        size: z.coerce.number().optional(),
+        page: z.coerce.number().default(0),
+        size: z.coerce.number().default(20),
       }),
     ),
     async (c) => {
-      const { q, page = 0, size = 20 } = c.req.valid('query')
+      const { q, page, size } = c.req.valid('query')
 
       const sparcsUsers = await userService.searchSparcsUser(q, page, size)
 
