@@ -47,10 +47,13 @@ export const searchSparcsUser = async (
     .innerJoin(sparcsUsers, eq(users.id, sparcsUsers.userId))
     .where(
       or(
-        like(sparcsUsers.nickname, `%${keyword}%`),
         like(
-          sql<string>`CONCAT(${users.lastName}, ${users.firstName})`,
-          `%${keyword}%`,
+          sql<string>`LOWER(${sparcsUsers.nickname})`,
+          `%${keyword.toLowerCase()}%`,
+        ),
+        like(
+          sql<string>`LOWER(CONCAT(${users.lastName}, ${users.firstName}))`,
+          `%${keyword.toLowerCase()}%`,
         ),
       ),
     )
