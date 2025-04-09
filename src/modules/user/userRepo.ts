@@ -4,12 +4,6 @@ import { type UserInsert, users } from '@/db/schema/user'
 import { sparcsUsers } from '@/db/schema/user-sparcs'
 import type { Paginated } from '@/lib/pagination'
 
-type SearchedSparcsUser = {
-  id: number
-  nickname: string
-  fullName: string
-}
-
 export const findUser = async (id: number, client: QueryClient = db) => {
   const [user] = await client.select().from(users).where(eq(users.id, id))
   return user ?? null
@@ -28,7 +22,13 @@ export const searchSparcsUser = async (
   page: number,
   size: number,
   client: QueryClient = db,
-): Promise<Paginated<SearchedSparcsUser>> => {
+): Promise<
+  Paginated<{
+    id: number
+    nickname: string
+    fullName: string
+  }>
+> => {
   const data = await client
     .select({
       id: users.id,
