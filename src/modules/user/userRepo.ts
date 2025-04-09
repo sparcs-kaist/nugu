@@ -29,10 +29,23 @@ export const searchSparcsUser = async (
     fullName: string
   }>
 > => {
-  const totalData = await client
+  const countResult = await client
     .select({ count: count() })
     .from(users)
     .innerJoin(sparcsUsers, eq(users.id, sparcsUsers.userId))
+    .where(
+      or(
+        like(
+          sql<string>`LOWER(${sparcsUsers.nickname})`,
+          `%${keyword.toLowerCase()}%`,
+        ),
+        like(
+          sql<string>`LOWER(CONCAT(${users.lastName}, ${users.firstName}))`,
+          `%${keyword.toLowerCase()}%`,
+        ),
+      ),
+    )
+  const totalCount = Number(countResult?.[0]?.count ?? 0)
 
   const data = await client
     .select({
@@ -65,8 +78,8 @@ export const searchSparcsUser = async (
     pageInfo: {
       page,
       size,
-      totalElements: totalData.length,
-      totalPages: Math.ceil(totalData.length / size),
+      totalElements: totalCount,
+      totalPages: Math.ceil(totalCount / size),
     },
   }
 }
