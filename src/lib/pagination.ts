@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 export type Paginated<T> = {
   data: T[]
   pageInfo: {
@@ -7,3 +9,14 @@ export type Paginated<T> = {
     totalPages: number
   }
 }
+
+export const PaginatedResponseSchema = <T>(schema: z.ZodType<T>) =>
+  z.object({
+    data: z.array(schema),
+    pageInfo: z.object({
+      page: z.number(),
+      size: z.number(),
+      totalElements: z.number(),
+      totalPages: z.number(),
+    }),
+  })
