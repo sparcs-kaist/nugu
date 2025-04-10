@@ -10,4 +10,5 @@ CREATE TABLE `email` (
 	CONSTRAINT `email_email_unique` UNIQUE(`email`)
 );
 --> statement-breakpoint
-ALTER TABLE `email` ADD CONSTRAINT `email_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE no action ON UPDATE no action;
+ALTER TABLE `email` ADD CONSTRAINT `email_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX `idx_email_01` ON `email` (`user_id`,`primary`);

@@ -1,1 +1,0 @@
-CREATE INDEX `idx_email_01` ON `email` (`user_id`,`primary`);

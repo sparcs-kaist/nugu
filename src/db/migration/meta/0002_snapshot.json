@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "92c716a1-6b22-4085-98ec-646c6741792c",
+  "id": "05cbf5a5-85f1-4666-aa58-0eaf091d72c1",
   "prevId": "6bab1967-ac91-4f47-aaf5-223b49f590d7",
   "tables": {
     "auth_account": {
@@ -159,7 +159,16 @@
           "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_email_01": {
+          "name": "idx_email_01",
+          "columns": [
+            "user_id",
+            "primary"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "email_user_id_user_id_fk": {
           "name": "email_user_id_user_id_fk",
