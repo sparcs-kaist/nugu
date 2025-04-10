@@ -29,9 +29,7 @@ export const findUserByAccount = async (
   return res?.user ?? null
 }
 
-export const createAccount = async (
+export const createAccount = (
   account: AccountInsert,
   client: QueryClient = db,
-) => {
-  await client.insert(authAccounts).values(account)
-}
+) => client.insert(authAccounts).values(account)

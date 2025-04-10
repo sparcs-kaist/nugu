@@ -50,9 +50,10 @@ const app = new Hono()
       const { access_token } = await google.issueToken(code)
       const googleInfo = await google.getUserInfo(access_token)
 
-      const userId = await authService.getOrRegisterUserByGoogle(googleInfo)
+      const { userId, userRoles } =
+        await authService.getOrRegisterUserByGoogle(googleInfo)
 
-      const authToken = await signAuthToken({ sub: userId })
+      const authToken = await signAuthToken({ sub: userId, roles: userRoles })
       await setAuthToken(c, authToken)
 
       return c.redirect(redirectURL)

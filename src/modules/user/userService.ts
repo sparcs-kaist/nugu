@@ -18,3 +18,8 @@ export const registerUser = (
   },
   client: QueryClient,
 ) => userRepo.createUser(user, client)
+
+export const getUserRoles = (userId: number) =>
+  userRepo
+    .findUserRoles(userId)
+    .then((userRoles) => userRoles.map(({ role }) => role))

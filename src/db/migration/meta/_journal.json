@@ -15,6 +15,13 @@
       "when": 1742886405193,
       "tag": "0001_luxuriant_roughhouse",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1744259484489,
+      "tag": "0002_smooth_monster_badoon",
+      "breakpoints": true
     }
   ]
 }

@@ -1,13 +1,15 @@
 import { transaction } from '@/db'
 import { createAccount, findUserByAccount } from '@/modules/auth/authRepo'
 import { type GoogleUserInfo } from '@/modules/auth/google'
-import { registerUser } from '@/modules/user/userService'
+import { getUserRoles, registerUser } from '@/modules/user/userService'
 
-const findUserByGoogleAccount = (googleAccountId: string) =>
-  findUserByAccount({
+const findUserByGoogleAccount = async (googleAccountId: string) => {
+  const user = await findUserByAccount({
     provider: 'GOOGLE',
     providerAccountId: googleAccountId,
   })
+  return user?.id ?? null
+}
 
 const registerUserAndCreateGoogleAccount = async (googleInfo: GoogleUserInfo) =>
   transaction(async (client) => {
@@ -33,7 +35,9 @@ const registerUserAndCreateGoogleAccount = async (googleInfo: GoogleUserInfo) =>
   })
 
 export const getOrRegisterUserByGoogle = async (googleInfo: GoogleUserInfo) => {
-  const user = await findUserByGoogleAccount(googleInfo.sub)
-  if (user !== null) return user.id
-  return registerUserAndCreateGoogleAccount(googleInfo)
+  const userId =
+    (await findUserByGoogleAccount(googleInfo.sub)) ||
+    (await registerUserAndCreateGoogleAccount(googleInfo))
+  const userRoles = await getUserRoles(userId)
+  return { userId, userRoles }
 }
