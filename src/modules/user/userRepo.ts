@@ -1,6 +1,7 @@
 import { count, eq, like, or, sql } from 'drizzle-orm'
 import { type QueryClient, db } from '@/db'
 import { type UserInsert, users } from '@/db/schema/user'
+import { userRoles } from '@/db/schema/user-role'
 import { sparcsUsers } from '@/db/schema/user-sparcs'
 import type { Paginated } from '@/lib/pagination'
 
@@ -83,3 +84,11 @@ export const searchSparcsUser = async (
     },
   }
 }
+
+export const getUserRoles = (userId: number, client: QueryClient = db) =>
+  client
+    .select({
+      role: userRoles.role,
+    })
+    .from(userRoles)
+    .where(eq(userRoles.userId, userId))

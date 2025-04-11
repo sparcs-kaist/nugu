@@ -1,6 +1,7 @@
 import { sign, verify } from 'hono/jwt'
 import { z } from 'zod'
 import { env } from '@/env'
+import { roles } from '@/lib/role'
 
 const JWT_ALGORITHM = 'HS256'
 
@@ -8,6 +9,7 @@ const tokenSchema = z.object({
   authToken: z.object({
     sub: z.number(),
     iat: z.number(),
+    roles: z.array(z.enum(roles)),
   }),
 })
 type Token = z.infer<typeof tokenSchema>

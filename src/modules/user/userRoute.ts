@@ -2,7 +2,7 @@ import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { paginatedResponseSchema } from '@/lib/pagination'
-import { authGuard } from '@/modules/auth/authGuard'
+import { authGuard, authSparcsGuard } from '@/modules/auth/authGuard'
 import * as userService from '@/modules/user/userService'
 
 const app = new Hono()
@@ -23,6 +23,7 @@ const app = new Hono()
         size: z.coerce.number().default(20),
       }),
     ),
+    authSparcsGuard,
     async (c) => {
       const { q, page, size } = c.req.valid('query')
 
@@ -42,6 +43,7 @@ const app = new Hono()
   .get(
     '/:id',
     zValidator('param', z.object({ id: z.coerce.number() })),
+    authSparcsGuard,
     async (c) => {
       const { id } = c.req.valid('param')
 

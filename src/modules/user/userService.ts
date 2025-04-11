@@ -21,3 +21,8 @@ export const registerUser = (
 
 export const searchSparcsUser = (keyword: string, page: number, size: number) =>
   userRepo.searchSparcsUser(keyword, page, size)
+
+export const getUserRoles = async (userId: number) => {
+  const userRoles = await userRepo.getUserRoles(userId)
+  return userRoles.map(({ role }) => role)
+}
