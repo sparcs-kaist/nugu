@@ -85,7 +85,7 @@ export const searchSparcsUser = async (
   }
 }
 
-export const findUserRoles = (userId: number, client: QueryClient = db) =>
+export const getUserRoles = (userId: number, client: QueryClient = db) =>
   client
     .select({
       role: userRoles.role,

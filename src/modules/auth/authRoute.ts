@@ -50,8 +50,8 @@ const app = new Hono()
       const { access_token } = await google.issueToken(code)
       const googleInfo = await google.getUserInfo(access_token)
 
-      const { userId, userRoles } =
-        await authService.getOrRegisterUserByGoogle(googleInfo)
+      const userId = await authService.getOrRegisterUserByGoogle(googleInfo)
+      const userRoles = await authService.getUserRoles(userId)
 
       const authToken = await signAuthToken({ sub: userId, roles: userRoles })
       await setAuthToken(c, authToken)

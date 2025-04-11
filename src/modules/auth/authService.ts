@@ -1,15 +1,16 @@
 import { transaction } from '@/db'
-import { createAccount, findUserByAccount } from '@/modules/auth/authRepo'
+import * as authRepo from '@/modules/auth/authRepo'
 import { type GoogleUserInfo } from '@/modules/auth/google'
-import { getUserRoles, registerUser } from '@/modules/user/userService'
+import {
+  getUserRoles as _getUserRoles,
+  registerUser,
+} from '@/modules/user/userService'
 
-const findUserByGoogleAccount = async (googleAccountId: string) => {
-  const user = await findUserByAccount({
+const findUserByGoogleAccount = (googleAccountId: string) =>
+  authRepo.findUserByAccount({
     provider: 'GOOGLE',
     providerAccountId: googleAccountId,
   })
-  return user?.id ?? null
-}
 
 const registerUserAndCreateGoogleAccount = async (googleInfo: GoogleUserInfo) =>
   transaction(async (client) => {
@@ -20,7 +21,7 @@ const registerUserAndCreateGoogleAccount = async (googleInfo: GoogleUserInfo) =>
       },
       client,
     )
-    await createAccount(
+    await authRepo.createAccount(
       {
         name: googleInfo.name,
         userId,
@@ -35,9 +36,9 @@ const registerUserAndCreateGoogleAccount = async (googleInfo: GoogleUserInfo) =>
   })
 
 export const getOrRegisterUserByGoogle = async (googleInfo: GoogleUserInfo) => {
-  const userId =
-    (await findUserByGoogleAccount(googleInfo.sub)) ||
-    (await registerUserAndCreateGoogleAccount(googleInfo))
-  const userRoles = await getUserRoles(userId)
-  return { userId, userRoles }
+  const user = await findUserByGoogleAccount(googleInfo.sub)
+  if (user !== null) return user.id
+  return registerUserAndCreateGoogleAccount(googleInfo)
 }
+
+export const getUserRoles = (userId: number) => _getUserRoles(userId)
