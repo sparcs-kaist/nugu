@@ -18,7 +18,7 @@ const app = new Hono()
     zValidator(
       'query',
       z.object({
-        q: z.string().min(1, '검색어는 필수입니다.'),
+        q: z.string().nonempty('검색어는 필수입니다.'),
         page: z.coerce.number().default(0),
         size: z.coerce.number().default(20),
       }),
