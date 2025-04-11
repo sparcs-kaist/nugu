@@ -1,7 +1,7 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { PaginatedResponseSchema } from '@/lib/pagination'
+import { paginatedResponseSchema } from '@/lib/pagination'
 import { authGuard } from '@/modules/auth/authGuard'
 import * as userService from '@/modules/user/userService'
 
@@ -28,7 +28,7 @@ const app = new Hono()
 
       const sparcsUsers = await userService.searchSparcsUser(q, page, size)
 
-      const validatedUsers = PaginatedResponseSchema(
+      const validatedUsers = paginatedResponseSchema(
         z.object({
           id: z.number(),
           nickname: z.string(),

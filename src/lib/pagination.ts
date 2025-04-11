@@ -10,7 +10,7 @@ export type Paginated<T> = {
   }
 }
 
-export const PaginatedResponseSchema = <T>(schema: z.ZodType<T>) =>
+export const paginatedResponseSchema = <T>(schema: z.ZodType<T>) =>
   z.object({
     data: z.array(schema),
     pageInfo: z.object({
