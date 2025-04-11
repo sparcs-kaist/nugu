@@ -18,3 +18,6 @@ export const registerUser = (
   },
   client: QueryClient,
 ) => userRepo.createUser(user, client)
+
+export const searchSparcsUser = (keyword: string, page: number, size: number) =>
+  userRepo.searchSparcsUser(keyword, page, size)
