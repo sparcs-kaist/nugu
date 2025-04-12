@@ -1,5 +1,5 @@
 import { match } from 'ts-pattern'
-import { type QueryClient, db, transaction } from '@/db'
+import { type QueryClient, db } from '@/db'
 import { type Result, result } from '@/lib/result'
 import * as emailRepo from '@/modules/user/emailRepo'
 
@@ -64,11 +64,7 @@ export const setPrimaryEmail = async (
       code: 'EMAIL_NOT_VERIFIED',
     })
 
-  if (!email.primary)
-    await transaction(async (client) => {
-      await emailRepo.unsetPrimaryEmail(userId, client)
-      await emailRepo.setPrimaryEmail(emailId, client)
-    })
+  if (!email.primary) await emailRepo.changePrimaryEmail(emailId, userId)
 
   return result.ok(null)
 }

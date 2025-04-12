@@ -33,22 +33,32 @@ export const setEmailVerified = async (
     .where(eq(emails.id, emailId))
 }
 
-export const setPrimaryEmail = async (
-  emailId: number,
-  client: QueryClient = db,
-) => {
+const setPrimaryEmail = async (emailId: number, client: QueryClient = db) => {
   await client
     .update(emails)
     .set({ primary: true })
     .where(eq(emails.id, emailId))
 }
 
-export const unsetPrimaryEmail = async (
-  userId: number,
-  client: QueryClient = db,
-) => {
+const unsetPrimaryEmail = async (userId: number, client: QueryClient = db) => {
   await client
     .update(emails)
     .set({ primary: false })
     .where(and(eq(emails.userId, userId), eq(emails.primary, true)))
+}
+
+export const changePrimaryEmail = async (
+  emailId: number,
+  userId: number,
+  client: QueryClient = db,
+) => {
+  await client.transaction(async (tx) => {
+    await tx
+      .select()
+      .from(emails)
+      .where(and(eq(emails.userId, userId), eq(emails.primary, true)))
+      .for('update')
+    await unsetPrimaryEmail(userId, tx)
+    await setPrimaryEmail(emailId, tx)
+  })
 }
