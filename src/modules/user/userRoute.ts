@@ -6,7 +6,6 @@ import { z } from 'zod'
 import { response } from '@/lib/response'
 import { authGuard } from '@/modules/auth/authGuard'
 import * as emailService from '@/modules/user/emailService'
-import { setPrimaryEmail } from '@/modules/user/emailService'
 import * as userService from '@/modules/user/userService'
 
 const app = new Hono()
@@ -70,7 +69,7 @@ const app = new Hono()
           message: 'You are not allowed to set primary email for this user',
         })
 
-      const res = await setPrimaryEmail(userId, emailId)
+      const res = await emailService.setPrimaryEmail(userId, emailId)
       if (res.ok) return response.noContent(c)
 
       return match(res.error)
