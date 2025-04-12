@@ -57,17 +57,18 @@ export const getOrRegisterUserByGoogle = async (googleInfo: GoogleUserInfo) => {
   const user = await findUserByGoogleAccount(googleInfo.sub)
   if (user) return user.id
 
+  // There already exists a user with the same email
   const existingEmail = await findEmail(googleInfo.email)
   if (existingEmail) {
     const userId = existingEmail.userId
-    if (existingEmail.verified) {
-      await createGoogleAccount(userId, googleInfo)
-    } else {
-      await transaction(async (client) => {
-        await createGoogleAccount(userId, googleInfo, client)
+
+    await transaction(async (client) => {
+      await createGoogleAccount(userId, googleInfo, client)
+
+      if (!existingEmail.verified && googleInfo.email_verified)
         await setEmailVerified(existingEmail.id, client)
-      })
-    }
+    })
+
     return userId
   }
 
